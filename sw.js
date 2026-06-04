@@ -1,4 +1,5 @@
-const CACHE = 'hifz-v1';
+
+const CACHE = 'hifz-v6';
 const ASSETS = [
   './',
   './index.html',
@@ -6,14 +7,14 @@ const ASSETS = [
   'https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap',
   'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'
 ];
-
+ 
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(CACHE).then(cache => cache.addAll(ASSETS)).catch(() => {})
   );
   self.skipWaiting();
 });
-
+ 
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys().then(keys =>
@@ -22,7 +23,7 @@ self.addEventListener('activate', e => {
   );
   self.clients.claim();
 });
-
+ 
 self.addEventListener('fetch', e => {
   e.respondWith(
     caches.match(e.request).then(cached => {
@@ -36,3 +37,4 @@ self.addEventListener('fetch', e => {
     })
   );
 });
+ 
