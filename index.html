@@ -2033,7 +2033,26 @@ if (!centerName) {
 }
 
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js');
+  navigator.serviceWorker.register('sw.js').then(reg => {
+    // Check for updates every time the page loads
+    reg.update();
+    // When new version is found, activate it immediately
+    reg.addEventListener('updatefound', () => {
+      const newWorker = reg.installing;
+      newWorker.addEventListener('statechange', () => {
+        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+          // New version ready — reload automatically
+          navigator.serviceWorker.controller.postMessage({action: 'skipWaiting'});
+          window.location.reload();
+        }
+      });
+    });
+  });
+  // When SW takes control, reload once to get fresh content
+  let refreshing = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!refreshing) { refreshing = true; window.location.reload(); }
+  });
 }
 
 // ===================== REPORTS =====================
