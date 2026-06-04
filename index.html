@@ -2246,24 +2246,34 @@ function printHalaqaSheet(hid) {
     const sh=(s.halaqat||[]).find(sh=>sh.hid===hid);
     const eff=sh.feeType==='exempt'?0:(sh.feeType==='reduced'||sh.feeType==='sponsored')?(sh.customAmount||0):h.amount;
     const status=sh.feeType==='exempt'?'معفية':sh.feeType==='sponsored'?'بكفالة':sh.paid?'✓ دفعت':'✗ لم تدفع';
-    return `<tr><td>${i+1}</td><td>${esc(s.name)}</td><td dir="ltr">${esc(s.phone||'—')}</td><td>${eff} د.ب</td><td>${status}</td><td style="width:80px;border-bottom:1px solid #999;"></td></tr>`;
+    const statusColor=sh.paid||sh.feeType==='exempt'||sh.feeType==='sponsored'?'#0F6E56':'#E24B4A';
+    return `<tr><td style="width:30px;text-align:center;">${i+1}</td><td style="min-width:140px;">${esc(s.name)}</td><td style="width:90px;" dir="ltr">${esc(s.phone||'—')}</td><td style="width:60px;text-align:center;">${eff} د.ب</td><td style="width:70px;text-align:center;color:${statusColor};font-weight:600;">${status}</td><td style="width:90px;"></td></tr>`;
   }).join('');
 
   const win = window.open('','_blank');
   win.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width"/>
   <style>
-    body{font-family:Tahoma,Arial,sans-serif;padding:28px;color:#111;font-size:13px;}
-    h2{color:#0F6E56;margin-bottom:4px;}
-    .meta{color:#666;font-size:12px;margin-bottom:20px;}
-    table{width:100%;border-collapse:collapse;}
-    th{background:#0F6E56;color:#fff;padding:8px 12px;text-align:right;font-size:12px;}
-    td{padding:8px 12px;border-bottom:1px solid #eee;}
-    .summary{display:flex;gap:24px;margin-bottom:20px;padding:12px;background:#f5f5f5;border-radius:8px;}
-    .s-item{text-align:center;} .s-val{font-size:18px;font-weight:700;color:#0F6E56;} .s-lbl{font-size:11px;color:#666;}
-    @media print{button{display:none;}}
+    *{box-sizing:border-box;}
+    body{font-family:Tahoma,Arial,sans-serif;padding:16px;color:#111;font-size:12px;margin:0;}
+    h2{color:#0F6E56;margin-bottom:2px;font-size:15px;}
+    .meta{color:#666;font-size:11px;margin-bottom:12px;}
+    table{width:100%;border-collapse:collapse;table-layout:fixed;}
+    th{background:#0F6E56;color:#fff;padding:7px 8px;text-align:right;font-size:11px;white-space:nowrap;}
+    td{padding:6px 8px;border-bottom:1px solid #eee;word-wrap:break-word;overflow-wrap:break-word;vertical-align:middle;line-height:1.4;}
+    .summary{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px;padding:10px;background:#f5f5f5;border-radius:6px;}
+    .s-item{text-align:center;min-width:60px;}
+    .s-val{font-size:16px;font-weight:700;color:#0F6E56;}
+    .s-lbl{font-size:10px;color:#666;}
+    .sign{margin-top:24px;display:flex;justify-content:space-between;font-size:11px;color:#666;}
+    @media print{
+      button{display:none;}
+      body{padding:10px;}
+      tr{page-break-inside:avoid;}
+    }
   </style></head><body>
   <h2>${esc(centerName)} — كشف حلقة ${esc(h.name)}</h2>
-  <div class="meta">${h.teacher?'المعلمة: '+esc(h.teacher)+' · ':''} الفصل: ${esc(semester)} · تاريخ الطباعة: ${new Date().toLocaleDateString('ar-BH')}</div>
+  <div class="meta">${h.teacher?'المعلمة: '+esc(h.teacher)+' · ':''} ${h.supervisor?'المشرفة: '+esc(h.supervisor)+' · ':''} الفصل: ${esc(semester)} · ${new Date().toLocaleDateString('ar-BH')}</div>
   <div class="summary">
     <div class="s-item"><div class="s-val">${st.studs.length}</div><div class="s-lbl">إجمالي</div></div>
     <div class="s-item"><div class="s-val" style="color:#0F6E56">${st.paidCount}</div><div class="s-lbl">دفعن</div></div>
@@ -2271,9 +2281,11 @@ function printHalaqaSheet(hid) {
     <div class="s-item"><div class="s-val">${st.paid} د.ب</div><div class="s-lbl">محصّل</div></div>
     <div class="s-item"><div class="s-val" style="color:#E24B4A">${st.unpaid} د.ب</div><div class="s-lbl">متبقي</div></div>
   </div>
-  <table><thead><tr><th>#</th><th>الاسم</th><th>الهاتف</th><th>الرسوم</th><th>الحالة</th><th>توقيع الاستلام</th></tr></thead>
-  <tbody>${rows}</tbody></table>
-  <div style="margin-top:32px;display:flex;justify-content:space-between;font-size:12px;color:#666;">
+  <table>
+    <thead><tr><th style="width:30px;">#</th><th>الاسم</th><th style="width:90px;">الهاتف</th><th style="width:60px;">الرسوم</th><th style="width:70px;">الحالة</th><th style="width:90px;">توقيع الاستلام</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>
+  <div class="sign">
     <span>توقيع المعلمة: ________________</span>
     <span>توقيع المشرفة: ________________</span>
   </div>
@@ -2289,21 +2301,30 @@ function printDouraSheet(did) {
     const sec=st.sections.find(sec=>sec.id===s.sectionId)||st.sections[0];
     const eff=st.effAmt(s);
     const status=s.feeType==='exempt'?'معفية':s.feeType==='sponsored'?'بكفالة':s.paid?'✓ دفعت':'✗ لم تدفع';
-    return `<tr><td>${i+1}</td><td>${esc(s.name)}</td><td dir="ltr">${esc(s.phone||'—')}</td><td>${esc(sec?sec.name:'—')}</td><td>${eff} د.ب</td><td>${status}</td><td style="width:80px;border-bottom:1px solid #999;"></td></tr>`;
+    const statusColor=s.paid||s.feeType==='exempt'||s.feeType==='sponsored'?'#0F6E56':'#E24B4A';
+    return `<tr><td style="width:30px;text-align:center;">${i+1}</td><td style="min-width:130px;">${esc(s.name)}</td><td style="width:90px;" dir="ltr">${esc(s.phone||'—')}</td><td style="width:70px;">${esc(sec?sec.name:'—')}</td><td style="width:60px;text-align:center;">${eff} د.ب</td><td style="width:70px;text-align:center;color:${statusColor};font-weight:600;">${status}</td><td style="width:90px;"></td></tr>`;
   }).join('');
 
   const win = window.open('','_blank');
   win.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width"/>
   <style>
-    body{font-family:Tahoma,Arial,sans-serif;padding:28px;color:#111;font-size:13px;}
-    h2{color:#BA7517;margin-bottom:4px;}
-    .meta{color:#666;font-size:12px;margin-bottom:20px;}
-    table{width:100%;border-collapse:collapse;}
-    th{background:#BA7517;color:#fff;padding:8px 12px;text-align:right;font-size:12px;}
-    td{padding:8px 12px;border-bottom:1px solid #eee;}
-    .summary{display:flex;gap:24px;margin-bottom:20px;padding:12px;background:#f5f5f5;border-radius:8px;flex-wrap:wrap;}
-    .s-item{text-align:center;} .s-val{font-size:18px;font-weight:700;color:#BA7517;} .s-lbl{font-size:11px;color:#666;}
-    @media print{button{display:none;}}
+    *{box-sizing:border-box;}
+    body{font-family:Tahoma,Arial,sans-serif;padding:16px;color:#111;font-size:12px;margin:0;}
+    h2{color:#BA7517;margin-bottom:2px;font-size:15px;}
+    .meta{color:#666;font-size:11px;margin-bottom:12px;}
+    table{width:100%;border-collapse:collapse;table-layout:fixed;}
+    th{background:#BA7517;color:#fff;padding:7px 8px;text-align:right;font-size:11px;white-space:nowrap;}
+    td{padding:6px 8px;border-bottom:1px solid #eee;word-wrap:break-word;overflow-wrap:break-word;vertical-align:middle;line-height:1.4;}
+    .summary{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px;padding:10px;background:#f5f5f5;border-radius:6px;}
+    .s-item{text-align:center;min-width:60px;}
+    .s-val{font-size:16px;font-weight:700;color:#BA7517;}
+    .s-lbl{font-size:10px;color:#666;}
+    @media print{
+      button{display:none;}
+      body{padding:10px;}
+      tr{page-break-inside:avoid;}
+    }
   </style></head><body>
   <h2>${esc(centerName)} — كشف ${esc(d.name)}</h2>
   <div class="meta">${d.date?esc(d.date)+' · ':''} تاريخ الطباعة: ${new Date().toLocaleDateString('ar-BH')}</div>
@@ -2315,9 +2336,11 @@ function printDouraSheet(did) {
     <div class="s-item"><div class="s-val" style="color:#E24B4A">${st.unpaid} د.ب</div><div class="s-lbl">متبقي</div></div>
     ${st.sections.map(sec=>`<div class="s-item"><div class="s-val">${(d.students||[]).filter(s=>s.sectionId===sec.id).length}</div><div class="s-lbl">${esc(sec.name)}</div></div>`).join('')}
   </div>
-  <table><thead><tr><th>#</th><th>الاسم</th><th>الهاتف</th><th>القسم</th><th>الرسوم</th><th>الحالة</th><th>توقيع الاستلام</th></tr></thead>
-  <tbody>${rows}</tbody></table>
-  <div style="margin-top:32px;font-size:12px;color:#666;text-align:left;">تاريخ الطباعة: ${new Date().toLocaleDateString('ar-BH')}</div>
+  <table>
+    <thead><tr><th style="width:30px;">#</th><th>الاسم</th><th style="width:90px;">الهاتف</th><th style="width:70px;">القسم</th><th style="width:60px;">الرسوم</th><th style="width:70px;">الحالة</th><th style="width:90px;">توقيع الاستلام</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>
+  <div style="margin-top:24px;font-size:11px;color:#666;text-align:left;">تاريخ الطباعة: ${new Date().toLocaleDateString('ar-BH')}</div>
   <script>window.onload=()=>window.print();<\/script></body></html>`);
   win.document.close();
 }
