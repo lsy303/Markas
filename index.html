@@ -162,9 +162,10 @@ textarea.copybox{font-family:monospace;font-size:13px;padding:10px;border:1px so
 @media print {
   body * { visibility: hidden; }
   #print-area, #print-area * { visibility: visible; }
-  #print-area { position: fixed; inset: 0; padding: 20px; background: white; }
+  #print-area { position: absolute; top: 0; left: 0; right: 0; padding: 10px; background: white; }
   .no-print { display: none !important; }
-  .rpt-section { break-inside: avoid; margin-bottom: 24px; border: 1px solid #ccc; }
+  .rpt-section { break-inside: auto; margin-bottom: 16px; border: 1px solid #ccc; }
+  .rpt-section table tr { page-break-inside: avoid; }
   .rpt-header { background: #0F6E56 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .topbar, .tabs, .toolbar { display: none !important; }
 }
