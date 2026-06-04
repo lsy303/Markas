@@ -1733,10 +1733,18 @@ function saveHalaqa() {
 function deleteHalaqa(idx) {
   const h = halaqat[idx];
   const used = students.filter(s=>(s.halaqat||[]).some(sh=>sh.hid===h.id)).length;
-  if (used>0) { alert(`لا يمكن الحذف — ${used} طالبة مسجلة في هذه الحلقة.`); return; }
-  if (confirm('هل أنت متأكدة من حذف هذه الحلقة؟')) {
-    halaqat.splice(idx,1); saveData(); renderHalaqat();
-  }
+  const msg = used > 0
+    ? `⚠️ هذه الحلقة فيها ${used} طالبة مسجلة.\nالحذف سيزيل الحلقة من سجلات جميع الطالبات أيضاً.\n\nهل أنت متأكدة؟`
+    : 'هل أنت متأكدة من حذف هذه الحلقة؟';
+  if (!confirm(msg)) return;
+  // Remove halaqa from all students
+  students.forEach(s => {
+    if (s.halaqat) s.halaqat = s.halaqat.filter(sh => sh.hid !== h.id);
+  });
+  halaqat.splice(idx, 1);
+  saveData();
+  renderHalaqat();
+  renderStudents();
 }
 
 // WHATSAPP
