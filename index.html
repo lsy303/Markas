@@ -71,6 +71,7 @@ body{font-family:'Tajawal',sans-serif;background:var(--gray-bg);color:var(--text
 .btn.danger:hover{background:var(--red-light);border-color:#f0b0b0;}
 .btn.confirm{color:var(--green-dark);}
 .btn.confirm:hover{background:var(--green-light);}
+.btn.paymethod{display:flex;flex-direction:column;align-items:center;gap:4px;line-height:1.4;}
 
 input[type=text],input[type=number],select,textarea{font-family:'Tajawal',sans-serif;font-size:14px;padding:8px 11px;border:1px solid var(--gray-border);border-radius:var(--radius);background:var(--white);color:var(--text);outline:none;transition:border-color .15s;width:100%;}
 input:focus,select:focus,textarea:focus{border-color:var(--green);}
@@ -420,9 +421,9 @@ tr:hover td{background:#fdfcfa;}
       <button class="btn primary" onclick="openHalaqaModal()">+ إضافة حلقة</button>
     </div>
     <div class="card" style="overflow-x:auto;">
-      <table style="min-width:600px;">
+      <table style="min-width:760px;">
         <thead>
-          <tr><th>#</th><th>اسم الحلقة</th><th>المعلمة</th><th>المشرفة</th><th>المبلغ الفصلي</th><th>عدد الطالبات</th><th>إجراءات</th></tr>
+          <tr><th>#</th><th>اسم الحلقة</th><th>النوع</th><th>الوقت</th><th>المعلمة</th><th>المشرفة</th><th>المبلغ الفصلي</th><th>عدد الطالبات</th><th>إجراءات</th></tr>
         </thead>
         <tbody id="halaqat-tbody"></tbody>
       </table>
@@ -490,6 +491,7 @@ tr:hover td{background:#fdfcfa;}
     <h2 id="student-modal-title">إضافة طالبة جديدة</h2>
     <div class="form-group"><label>اسم الطالبة</label><input type="text" id="f-name" placeholder="الاسم الكامل"/></div>
     <div class="form-group"><label>رقم المستخدم (برنامج إقراء)</label><input type="text" id="f-userid" placeholder="12345678" dir="ltr" maxlength="8" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,8)"/></div>
+    <div class="form-group"><label>الرقم الشخصي (اختياري)</label><input type="text" id="f-personalid" placeholder="000000000" dir="ltr" maxlength="9" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,9)"/></div>
     <div class="form-group"><label>رقم الهاتف (8 أرقام - إنجليزي)</label><input type="text" id="f-phone" placeholder="12345678" dir="ltr" maxlength="8" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,8)"/></div>
     <div class="form-group"><label>ملاحظة (اختياري)</label><input type="text" id="f-note" placeholder="مثال: مسجلة في حلقتين"/></div>
     <div class="form-group"><label>الحلقات المسجلة فيها</label><div class="halaqa-check-list" id="halaqa-checklist"></div></div>
@@ -505,6 +507,15 @@ tr:hover td{background:#fdfcfa;}
   <div class="modal" onclick="event.stopPropagation()">
     <h2 id="halaqa-modal-title">إضافة حلقة جديدة</h2>
     <div class="form-group"><label>اسم الحلقة</label><input type="text" id="h-name" placeholder="مثال: حلقة الفجر"/></div>
+    <div class="form-group"><label>نوع الحلقة (اختياري)</label><input type="text" id="h-type" placeholder="مثال: تحفيظ / تجويد / مراجعة"/></div>
+    <div class="form-group">
+      <label>وقت الحلقة</label>
+      <select id="h-time">
+        <option value="">-- غير محدد --</option>
+        <option value="صباحي">☀️ صباحي</option>
+        <option value="مسائي">🌙 مسائي</option>
+      </select>
+    </div>
     <div class="form-group"><label>اسم المعلمة</label><input type="text" id="h-teacher" placeholder="مثال: أم عبدالله"/></div>
     <div class="form-group"><label>اسم المشرفة</label><input type="text" id="h-supervisor" placeholder="مثال: أم محمد"/></div>
     <div class="form-group"><label>المبلغ الفصلي (د.ب)</label><input type="number" id="h-amount" placeholder="10" min="0"/></div>
@@ -668,6 +679,21 @@ tr:hover td{background:#fdfcfa;}
   </div>
 </div>
 
+<!-- PAYMENT METHOD MODAL -->
+<div class="overlay" id="paymethod-overlay" onclick="overlayClick('paymethod-overlay',event)">
+  <div class="modal" style="width:340px;" onclick="event.stopPropagation()">
+    <h2>💳 طريقة الدفع</h2>
+    <div id="paymethod-info" style="font-size:13px;color:var(--text-muted);margin-bottom:16px;"></div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn confirm paymethod" style="flex:1;padding:16px 8px;font-size:14px;" onclick="confirmPaymentMethod('cash')">💵 كاش</button>
+      <button class="btn confirm paymethod" style="flex:1;padding:16px 8px;font-size:14px;" onclick="confirmPaymentMethod('benefit')">🏦 بنفت</button>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeOverlay('paymethod-overlay')">إلغاء</button>
+    </div>
+  </div>
+</div>
+
 <!-- FEE TYPE MODAL (دورات) -->
 <div class="overlay" id="doura-feetype-overlay" onclick="overlayClick('doura-feetype-overlay',event)">
   <div class="modal" style="width:380px;" onclick="event.stopPropagation()">
@@ -822,7 +848,7 @@ document.addEventListener('keydown', e => {
     else if (e.key === 'Backspace') pinDel();
     return;
   }
-  if (e.key === 'Escape') ['student-overlay','halaqa-overlay','bulk-overlay','import-overlay','doura-overlay','doura-student-overlay','renewal-overlay','enroll-overlay','msg-overlay','feetype-overlay','doura-feetype-overlay','center-settings-overlay','excel-import-overlay'].forEach(closeOverlay);
+  if (e.key === 'Escape') ['student-overlay','halaqa-overlay','bulk-overlay','import-overlay','doura-overlay','doura-student-overlay','renewal-overlay','enroll-overlay','msg-overlay','feetype-overlay','doura-feetype-overlay','center-settings-overlay','excel-import-overlay','paymethod-overlay'].forEach(closeOverlay);
 });
 
 // ===================== PIN =====================
@@ -1154,7 +1180,7 @@ function renderStudents() {
             : sh.paid
               ? `<div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;">
                    <span class="badge paid">✓ دفعت</span>
-                   ${sh.paidAt ? `<span class="paid-date">📅 ${fmtDate(sh.paidAt)}</span>` : ''}
+                   ${sh.paidAt ? `<span class="paid-date">📅 ${fmtDate(sh.paidAt)}${sh.paymentMethod?(sh.paymentMethod==='cash'?' · 💵 كاش':' · 🏦 بنفت'):''}</span>` : ''}
                  </div>
                  <button class="btn sm danger" onclick="event.stopPropagation();toggleHalaqaPaid(${s._i},'${sh.hid}')">إلغاء</button>`
               : `<span class="badge unpaid">✗ لم تدفع</span>
@@ -1175,7 +1201,7 @@ function renderStudents() {
       <div class="student-header" onclick="toggleCard('sc-${s._i}')">
         <div style="flex:1;min-width:0;pointer-events:none;">
           <div class="student-name">${esc(s.name)}</div>
-          <div class="student-phone" dir="ltr" style="text-align:right;">${s.userid?'#'+esc(s.userid)+'  ·  ':''}${esc(s.phone||'')}</div>
+          <div class="student-phone" dir="ltr" style="text-align:right;">${s.userid?'#'+esc(s.userid)+'  ·  ':''}${esc(s.phone||'')}${s.personalid?'  ·  🆔'+esc(s.personalid):''}</div>
           ${noteHtml}
           <div style="margin-top:5px;">${halaqaBadges}</div>
         </div>
@@ -1199,13 +1225,38 @@ function renderStudents() {
 function toggleCard(id) { const el=document.getElementById(id); if(el) el.classList.toggle('open'); }
 function togglePaused(idx) { students[idx].paused=!students[idx].paused; saveData(); renderStudents(); }
 
+let pendingPayment = null; // {kind:'halaqa'|'doura', ...refs}
+
 function toggleHalaqaPaid(studentIdx, hid) {
   const sh = (students[studentIdx].halaqat||[]).find(sh=>sh.hid===hid);
-  if (sh) {
-    sh.paid = !sh.paid;
-    sh.paidAt = sh.paid ? new Date().toISOString() : null;
+  if (!sh) return;
+  if (sh.paid) {
+    // Cancelling payment — no method needed
+    sh.paid = false; sh.paidAt = null; sh.paymentMethod = null;
     saveData(); renderStudents();
+  } else {
+    const s = students[studentIdx];
+    const h = halaqat.find(h=>h.id===hid);
+    pendingPayment = { kind:'halaqa', studentIdx, hid };
+    document.getElementById('paymethod-info').textContent = `${s.name} — ${h?h.name:''}`;
+    openOverlay('paymethod-overlay');
   }
+}
+
+function confirmPaymentMethod(method) {
+  if (!pendingPayment) return;
+  if (pendingPayment.kind === 'halaqa') {
+    const sh = (students[pendingPayment.studentIdx].halaqat||[]).find(sh=>sh.hid===pendingPayment.hid);
+    if (sh) { sh.paid = true; sh.paidAt = new Date().toISOString(); sh.paymentMethod = method; }
+    saveData(); renderStudents();
+  } else if (pendingPayment.kind === 'doura') {
+    const s = dourat[pendingPayment.douraIdx].students[pendingPayment.stuIdx];
+    s.paid = true; s.paidAt = new Date().toISOString(); s.paymentMethod = method;
+    saveData(); renderDourat(pendingPayment.douraIdx);
+  }
+  pendingPayment = null;
+  closeOverlay('paymethod-overlay');
+  toast(method==='cash' ? '✅ تم تسجيل الدفع (كاش)' : '✅ تم تسجيل الدفع (بنفت)');
 }
 
 async function deleteStudent(idx) {
@@ -1223,6 +1274,7 @@ function openStudentModal(id=null) {
   const s = id!==null ? students[id] : null;
   document.getElementById('f-name').value = s?s.name:'';
   document.getElementById('f-userid').value = s?(s.userid||''):'';
+  document.getElementById('f-personalid').value = s?(s.personalid||''):'';
   document.getElementById('f-phone').value = s?(s.phone||''):'';
   document.getElementById('f-note').value = s?(s.note||''):'';
   const cl = document.getElementById('halaqa-checklist');
@@ -1244,6 +1296,7 @@ function openStudentModal(id=null) {
 function saveStudent() {
   const name = document.getElementById('f-name').value.trim();
   const userid = document.getElementById('f-userid').value.trim();
+  const personalid = document.getElementById('f-personalid').value.trim();
   const phone = document.getElementById('f-phone').value.trim();
   const note = document.getElementById('f-note').value.trim();
   if (!name) { alert('يرجى إدخال اسم الطالبة'); return; }
@@ -1256,11 +1309,11 @@ function saveStudent() {
   const checked = [...document.querySelectorAll('#halaqa-checklist input[type=checkbox]:checked')].map(c=>c.value);
   if (editStudentId!==null) {
     const existing = students[editStudentId].halaqat||[];
-    students[editStudentId] = {...students[editStudentId], name, userid, phone, note,
+    students[editStudentId] = {...students[editStudentId], name, userid, personalid, phone, note,
       halaqat: checked.map(hid => existing.find(sh=>sh.hid===hid) || {hid,paid:false,paidAt:null})
     };
   } else {
-    students.push({id:uid(), name, userid, phone, note, halaqat: checked.map(hid=>({hid,paid:false,paidAt:null}))});
+    students.push({id:uid(), name, userid, personalid, phone, note, halaqat: checked.map(hid=>({hid,paid:false,paidAt:null}))});
   }
   saveData(); closeOverlay('student-overlay'); renderStudents();
   toast(editStudentId!==null?'✅ تم تحديث البيانات':'✅ تمت إضافة الطالبة');
@@ -1270,14 +1323,17 @@ function saveStudent() {
 function renderHalaqat() {
   const tbody = document.getElementById('halaqat-tbody');
   if (!halaqat.length) {
-    tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="empty-state-icon">📚</div><div class="empty-state-title">لا توجد حلقات بعد</div><div class="empty-state-sub">اضغطي "+ إضافة حلقة" للبدء</div></div></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="9"><div class="empty-state"><div class="empty-state-icon">📚</div><div class="empty-state-title">لا توجد حلقات بعد</div><div class="empty-state-sub">اضغطي "+ إضافة حلقة" للبدء</div></div></td></tr>';
     return;
   }
   tbody.innerHTML = halaqat.map((h,i) => {
     const count = students.filter(s=>(s.halaqat||[]).some(sh=>sh.hid===h.id)).length;
+    const timeLabel = h.time==='صباحي'?'☀️ صباحي':h.time==='مسائي'?'🌙 مسائي':'—';
     return `<tr>
       <td style="color:var(--text-muted);font-size:12px;">${i+1}</td>
       <td style="font-weight:600;">${esc(h.name)}</td>
+      <td style="color:var(--text-muted);">${esc(h.type||'—')}</td>
+      <td style="color:var(--text-muted);">${timeLabel}</td>
       <td style="color:var(--text-muted);">${esc(h.teacher||'—')}</td>
       <td style="color:var(--text-muted);">${esc(h.supervisor||'—')}</td>
       <td>${h.amount} د.ب</td>
@@ -1296,6 +1352,8 @@ function openHalaqaModal(id=null) {
   document.getElementById('halaqa-modal-title').textContent = id!==null?'تعديل الحلقة':'إضافة حلقة جديدة';
   const h = id!==null ? halaqat[id] : null;
   document.getElementById('h-name').value = h?h.name:'';
+  document.getElementById('h-type').value = h?(h.type||''):'';
+  document.getElementById('h-time').value = h?(h.time||''):'';
   document.getElementById('h-teacher').value = h?(h.teacher||''):'';
   document.getElementById('h-supervisor').value = h?(h.supervisor||''):'';
   document.getElementById('h-amount').value = h?h.amount:'';
@@ -1305,14 +1363,16 @@ function openHalaqaModal(id=null) {
 
 function saveHalaqa() {
   const name = document.getElementById('h-name').value.trim();
+  const type = document.getElementById('h-type').value.trim();
+  const time = document.getElementById('h-time').value;
   const teacher = document.getElementById('h-teacher').value.trim();
   const supervisor = document.getElementById('h-supervisor').value.trim();
   const amount = parseFloat(document.getElementById('h-amount').value)||0;
   if (!name) { alert('يرجى إدخال اسم الحلقة'); return; }
   if (editHalaqaId!==null) {
-    halaqat[editHalaqaId] = {...halaqat[editHalaqaId], name, teacher, supervisor, amount};
+    halaqat[editHalaqaId] = {...halaqat[editHalaqaId], name, type, time, teacher, supervisor, amount};
   } else {
-    halaqat.push({id:uid(), name, teacher, supervisor, amount});
+    halaqat.push({id:uid(), name, type, time, teacher, supervisor, amount});
   }
   saveData(); closeOverlay('halaqa-overlay'); renderHalaqat();
   toast(editHalaqaId!==null?'✅ تم تحديث الحلقة':'✅ تمت إضافة الحلقة');
@@ -1401,7 +1461,7 @@ function renderDourat(keepOpenIdx=null) {
             : s.paid
               ? `<div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;">
                    <span class="badge paid">✓ دفعت</span>
-                   ${s.paidAt ? `<span class="paid-date">📅 ${fmtDate(s.paidAt)}</span>` : ''}
+                   ${s.paidAt ? `<span class="paid-date">📅 ${fmtDate(s.paidAt)}${s.paymentMethod?(s.paymentMethod==='cash'?' · 💵 كاش':' · 🏦 بنفت'):''}</span>` : ''}
                  </div>
                  <button class="btn sm danger" onclick="event.stopPropagation();toggleDouraStudentPaid(${didx},${realIdx})">إلغاء</button>`
               : `<span class="badge unpaid">✗ لم تدفع</span>
@@ -1449,9 +1509,15 @@ function renderDourat(keepOpenIdx=null) {
 
 function toggleDouraStudentPaid(douraIdx, stuIdx) {
   const s = dourat[douraIdx].students[stuIdx];
-  s.paid = !s.paid;
-  s.paidAt = s.paid ? new Date().toISOString() : null;
-  saveData(); renderDourat(douraIdx);
+  if (s.paid) {
+    s.paid = false; s.paidAt = null; s.paymentMethod = null;
+    saveData(); renderDourat(douraIdx);
+  } else {
+    const d = dourat[douraIdx];
+    pendingPayment = { kind:'doura', douraIdx, stuIdx };
+    document.getElementById('paymethod-info').textContent = `${s.name} — ${d.name}`;
+    openOverlay('paymethod-overlay');
+  }
 }
 
 function deleteDouraStudent(douraIdx, stuIdx) {
@@ -1780,7 +1846,7 @@ function saveFeeType() {
   if(!sh) return;
   sh.feeType=document.getElementById('feetype-select').value;
   sh.customAmount=parseFloat(document.getElementById('feetype-amount').value)||0;
-  if(sh.feeType==='exempt'||sh.feeType==='sponsored'){ sh.paid=false; sh.paidAt=null; }
+  if(sh.feeType==='exempt'||sh.feeType==='sponsored'){ sh.paid=false; sh.paidAt=null; sh.paymentMethod=null; }
   saveData(); closeOverlay('feetype-overlay'); renderStudents();
 }
 
@@ -1801,7 +1867,7 @@ function saveDouraFeeType() {
   const s=dourat[feeTypeDouraIdx].students[feeTypeStuIdx];
   s.feeType=document.getElementById('doura-feetype-select').value;
   s.customAmount=parseFloat(document.getElementById('doura-feetype-amount').value)||0;
-  if(s.feeType==='exempt'||s.feeType==='sponsored'){ s.paid=false; s.paidAt=null; }
+  if(s.feeType==='exempt'||s.feeType==='sponsored'){ s.paid=false; s.paidAt=null; s.paymentMethod=null; }
   saveData(); closeOverlay('doura-feetype-overlay'); renderDourat(feeTypeDouraIdx);
 }
 
@@ -1899,7 +1965,7 @@ function renderReports() {
                 :sh.feeType==='sponsored'?'<span class="badge" style="background:var(--blue-light);color:var(--blue);">بكفالة</span>'
                 :sh.paid?'<span class="badge paid">✓ دفعت</span>'
                 :'<span class="badge unpaid">✗ لم تدفع</span>';
-              const dateStr = sh.paid && sh.paidAt ? `<span style="font-size:11px;color:var(--green-dark);">📅 ${fmtDate(sh.paidAt)}</span>` : '—';
+              const dateStr = sh.paid && sh.paidAt ? `<span style="font-size:11px;color:var(--green-dark);">📅 ${fmtDate(sh.paidAt)}${sh.paymentMethod?(sh.paymentMethod==='cash'?' · 💵':' · 🏦'):''}</span>` : '—';
               return `<tr><td style="color:var(--text-muted)">${i+1}</td><td style="font-weight:500">${esc(s.name)}</td><td dir="ltr" style="color:var(--text-muted)">${esc(s.phone||'—')}</td><td>${eff} د.ب</td><td>${statusBadge}</td><td>${dateStr}</td></tr>`;
             }).join('')}
           </tbody>
@@ -1938,7 +2004,7 @@ function renderReports() {
                 :s.feeType==='sponsored'?'<span class="badge" style="background:var(--blue-light);color:var(--blue);">بكفالة</span>'
                 :s.paid?'<span class="badge paid">✓ دفعت</span>'
                 :'<span class="badge unpaid">✗ لم تدفع</span>';
-              const dateStr = s.paid && s.paidAt ? `<span style="font-size:11px;color:var(--green-dark);">📅 ${fmtDate(s.paidAt)}</span>` : '—';
+              const dateStr = s.paid && s.paidAt ? `<span style="font-size:11px;color:var(--green-dark);">📅 ${fmtDate(s.paidAt)}${s.paymentMethod?(s.paymentMethod==='cash'?' · 💵':' · 🏦'):''}</span>` : '—';
               return `<tr><td style="color:var(--text-muted)">${i+1}</td><td style="font-weight:500">${esc(s.name)}</td><td dir="ltr" style="color:var(--text-muted)">${esc(s.phone||'—')}</td><td>${esc(sec?sec.name:'—')}</td><td>${eff} د.ب</td><td>${statusBadge}</td><td>${dateStr}</td></tr>`;
             }).join('')}
           </tbody>
@@ -1970,7 +2036,7 @@ function printHalaqaSheet(hid) {
     const eff=sh.feeType==='exempt'?0:(sh.feeType==='reduced'||sh.feeType==='sponsored')?(sh.customAmount||0):h.amount;
     const status=sh.feeType==='exempt'?'معفية':sh.feeType==='sponsored'?'بكفالة':sh.paid?'✓ دفعت':'✗ لم تدفع';
     const statusColor=sh.paid||sh.feeType==='exempt'||sh.feeType==='sponsored'?'#0F6E56':'#E24B4A';
-    const dateStr = sh.paid && sh.paidAt ? fmtDate(sh.paidAt) : '—';
+    const dateStr = sh.paid && sh.paidAt ? fmtDate(sh.paidAt) + (sh.paymentMethod ? (sh.paymentMethod==='cash'?' (كاش)':' (بنفت)') : '') : '—';
     return `<tr><td style="width:30px;text-align:center;">${i+1}</td><td style="min-width:140px;">${esc(s.name)}</td><td style="width:90px;" dir="ltr">${esc(s.phone||'—')}</td><td style="width:60px;text-align:center;">${eff} د.ب</td><td style="width:70px;text-align:center;color:${statusColor};font-weight:600;">${status}</td><td style="width:85px;text-align:center;font-size:11px;color:#555;">${dateStr}</td><td style="width:80px;"></td></tr>`;
   }).join('');
   const win = window.open('','_blank');
@@ -2008,7 +2074,7 @@ function printDouraSheet(did) {
     const eff=st.effAmt(s);
     const status=s.feeType==='exempt'?'معفية':s.feeType==='sponsored'?'بكفالة':s.paid?'✓ دفعت':'✗ لم تدفع';
     const statusColor=s.paid||s.feeType==='exempt'||s.feeType==='sponsored'?'#0F6E56':'#E24B4A';
-    const dateStr = s.paid && s.paidAt ? fmtDate(s.paidAt) : '—';
+    const dateStr = s.paid && s.paidAt ? fmtDate(s.paidAt) + (s.paymentMethod ? (s.paymentMethod==='cash'?' (كاش)':' (بنفت)') : '') : '—';
     return `<tr><td style="width:30px;text-align:center;">${i+1}</td><td style="min-width:130px;">${esc(s.name)}</td><td style="width:90px;" dir="ltr">${esc(s.phone||'—')}</td><td style="width:70px;">${esc(sec?sec.name:'—')}</td><td style="width:60px;text-align:center;">${eff} د.ب</td><td style="width:70px;text-align:center;color:${statusColor};font-weight:600;">${status}</td><td style="width:85px;text-align:center;font-size:11px;color:#555;">${dateStr}</td><td style="width:80px;"></td></tr>`;
   }).join('');
   const win = window.open('','_blank');
@@ -2041,27 +2107,29 @@ function exportReportExcel() {
   if (typeof XLSX==='undefined') { alert('مكتبة Excel غير متوفرة'); return; }
   const wb = XLSX.utils.book_new();
   if (halaqat.length) {
-    const data=[['الحلقة','المعلمة','إجمالي الطالبات','المحصّل','المتبقي','نسبة التحصيل']];
-    halaqat.forEach(h=>{const st=calcHalaqaStats(h);const pct=st.expected>0?Math.round(st.paid/st.expected*100):100;data.push([h.name,h.teacher||'—',st.studs.length,st.paid,st.unpaid,pct+'%']);});
+    const data=[['الحلقة','النوع','الوقت','المعلمة','إجمالي الطالبات','المحصّل','المتبقي','نسبة التحصيل']];
+    halaqat.forEach(h=>{const st=calcHalaqaStats(h);const pct=st.expected>0?Math.round(st.paid/st.expected*100):100;data.push([h.name,h.type||'—',h.time||'—',h.teacher||'—',st.studs.length,st.paid,st.unpaid,pct+'%']);});
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(data), 'الحلقات');
   }
   if (students.length) {
-    const data=[['الاسم','الهاتف','رقم المستخدم','الحلقات','الحالة','تاريخ آخر دفع']];
+    const data=[['الاسم','الرقم الشخصي','الهاتف','رقم المستخدم','الحلقات','الحالة','تاريخ آخر دفع','طريقة الدفع']];
     students.forEach(s=>{
       const names=(s.halaqat||[]).map(sh=>{const h=halaqat.find(h=>h.id===sh.hid);return h?h.name:'';}).filter(Boolean).join(' / ');
       const hasUnpaid=(s.halaqat||[]).some(sh=>!sh.paid&&sh.feeType!=='exempt'&&sh.feeType!=='sponsored');
       const lastPaid=(s.halaqat||[]).filter(sh=>sh.paid&&sh.paidAt).sort((a,b)=>new Date(b.paidAt)-new Date(a.paidAt));
-      data.push([s.name,s.phone||'',s.userid||'',names,s.paused?'متوقفة':hasUnpaid?'متأخرة':'مكتملة',lastPaid.length?fmtDate(lastPaid[0].paidAt):'—']);
+      const method = lastPaid.length ? (lastPaid[0].paymentMethod==='cash'?'كاش':lastPaid[0].paymentMethod==='benefit'?'بنفت':'—') : '—';
+      data.push([s.name,s.personalid||'',s.phone||'',s.userid||'',names,s.paused?'متوقفة':hasUnpaid?'متأخرة':'مكتملة',lastPaid.length?fmtDate(lastPaid[0].paidAt):'—',method]);
     });
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(data), 'الطالبات');
   }
   dourat.filter(d=>!d.archived).forEach(d=>{
     const st=calcDouraStats(d);
-    const data=[['الاسم','الهاتف','القسم','الرسوم','الحالة','تاريخ الدفع']];
+    const data=[['الاسم','الهاتف','القسم','الرسوم','الحالة','تاريخ الدفع','طريقة الدفع']];
     st.studs.forEach(s=>{
       const sec=st.sections.find(sec=>sec.id===s.sectionId)||st.sections[0];
       const status=s.feeType==='exempt'?'معفية':s.feeType==='sponsored'?'بكفالة':s.paid?'دفعت':'لم تدفع';
-      data.push([s.name,s.phone||'',sec?sec.name:'—',st.effAmt(s),status,s.paid&&s.paidAt?fmtDate(s.paidAt):'—']);
+      const method = s.paid && s.paymentMethod ? (s.paymentMethod==='cash'?'كاش':'بنفت') : '—';
+      data.push([s.name,s.phone||'',sec?sec.name:'—',st.effAmt(s),status,s.paid&&s.paidAt?fmtDate(s.paidAt):'—',method]);
     });
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(data), d.name.slice(0,30));
   });
