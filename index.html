@@ -4,13 +4,14 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="theme-color" content="#1D9E75"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="مركز التحفيظ"/>
+<link rel="apple-touch-icon" href="icon-192.png"/>
+<meta name="mobile-web-app-capable" content="yes"/>
 <link rel="manifest" href="manifest.json"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<title>مركز — نظام متابعة الطالبات والرسوم</title>
-<meta name="description" content="نظام إدارة الطالبات والحلقات والدورات ومتابعة الرسوم لمراكز التحفيظ."/>
-<meta property="og:title" content="نظام متابعة الطالبات والرسوم"/>
-<meta property="og:description" content="نظام إدارة الطالبات والحلقات والدورات ومتابعة الرسوم لمراكز التحفيظ."/>
-<meta property="og:type" content="website"/>
+<title>مركز شيخان وشريفة الفارسي</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap');
 :root{
@@ -32,8 +33,8 @@ body{font-family:'Tajawal',sans-serif;background:var(--gray-bg);color:var(--text
 .topbar p{font-size:11px;color:var(--text-muted);}
 .topbar-actions{display:flex;gap:6px;flex-wrap:wrap;}
 
-.tabs{display:flex;gap:2px;padding:0 20px;background:var(--white);border-bottom:1px solid var(--gray-border);}
-.tab{font-family:'Tajawal',sans-serif;font-size:13px;font-weight:500;padding:10px 16px;border:none;background:none;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;}
+.tabs{display:flex;gap:2px;padding:0 20px;background:var(--white);border-bottom:1px solid var(--gray-border);overflow-x:auto;}
+.tab{font-family:'Tajawal',sans-serif;font-size:13px;font-weight:500;padding:10px 16px;border:none;background:none;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;}
 .tab.active{color:var(--green-dark);border-bottom-color:var(--green);}
 
 .container{max-width:1000px;margin:0 auto;padding:18px 14px;}
@@ -47,7 +48,8 @@ body{font-family:'Tajawal',sans-serif;background:var(--gray-bg);color:var(--text
 .stat-value.red{color:var(--red);}
 .stat-value.amber{color:var(--amber);}
 
-.toolbar{background:var(--white);border:1px solid var(--gray-border);border-radius:var(--radius-lg);padding:12px 14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px;}
+.toolbar{background:var(--white);border:1px solid var(--gray-border);border-radius:var(--radius-lg);padding:12px 14px;display:flex;flex-direction:column;gap:8px;margin-bottom:12px;}
+.toolbar-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
 .search-wrap{position:relative;flex:1;min-width:180px;}
 .search-wrap input{padding-right:34px;width:100%;}
 .search-icon{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--text-muted);}
@@ -113,20 +115,112 @@ tr:hover td{background:#fdfcfa;}
 .halaqa-check-label{font-size:13px;flex:1;}
 .halaqa-check-price{font-size:12px;color:var(--text-muted);}
 
-textarea.copybox{font-family:monospace;font-size:13px;padding:10px;border:1px solid var(--gray-border);border-radius:var(--radius);background:var(--gray-bg);color:var(--text);resize:none;line-height:1.9;width:100%;}
-
 .section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;}
 .section-title{font-size:15px;font-weight:600;}
 .export-note{font-size:11px;color:var(--text-muted);margin-top:10px;text-align:center;}
+
+/* DROPDOWN */
+.dropdown{position:relative;}
+.dropdown-menu{position:absolute;top:calc(100% + 6px);left:0;background:var(--white);border:1px solid var(--gray-border);border-radius:var(--radius-lg);box-shadow:0 8px 24px rgba(0,0,0,.12);min-width:200px;z-index:100;overflow:hidden;display:none;}
+.dropdown-menu.open{display:block;}
+.dropdown-item{display:flex;align-items:center;gap:10px;padding:11px 16px;font-family:'Tajawal',sans-serif;font-size:14px;font-weight:500;color:var(--text);cursor:pointer;border:none;background:none;width:100%;text-align:right;transition:background .1s;}
+.dropdown-item:hover{background:var(--gray-bg);}
+.dropdown-item.danger{color:var(--red);}
+.dropdown-item.wa{color:#25D366;}
+.dropdown-item.blue{color:var(--blue);}
+.dropdown-divider{height:1px;background:var(--gray-border);margin:4px 0;}
 
 @media(max-width:600px){
   .container{padding:10px 8px;}
   .topbar{padding:10px 12px;}
   .topbar h1{font-size:13px;}
+  .dropdown-menu{left:auto;right:0;}
 }
+
+/* REPORTS */
+.rpt-section{background:var(--white);border:1px solid var(--gray-border);border-radius:var(--radius-lg);margin-bottom:18px;overflow:hidden;}
+.rpt-header{background:var(--green-dark);color:#fff;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
+.rpt-header h3{font-size:15px;font-weight:700;margin:0;}
+.rpt-header span{font-size:13px;opacity:.85;}
+.rpt-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:1px;background:var(--gray-border);}
+.rpt-stat{background:var(--white);padding:12px 14px;text-align:center;}
+.rpt-stat-val{font-size:20px;font-weight:700;color:var(--green-dark);}
+.rpt-stat-val.red{color:var(--red);}
+.rpt-stat-val.amber{color:var(--amber);}
+.rpt-stat-label{font-size:11px;color:var(--text-muted);margin-top:2px;}
+.rpt-table{width:100%;border-collapse:collapse;font-size:13px;}
+.rpt-table th{background:#f5f4f0;font-weight:600;font-size:11px;color:var(--text-muted);padding:8px 14px;text-align:right;border-bottom:1px solid var(--gray-border);}
+.rpt-table td{padding:8px 14px;border-bottom:1px solid #f0eeea;vertical-align:middle;}
+.rpt-table tr:last-child td{border-bottom:none;}
+.rpt-table tr:hover td{background:#fdfcfa;}
+.progress-bar-wrap{background:#eee;border-radius:99px;height:6px;min-width:60px;}
+.progress-bar-fill{background:var(--green);height:6px;border-radius:99px;transition:width .3s;}
+
+/* PRINT */
+@media print {
+  body * { visibility: hidden; }
+  #print-area, #print-area * { visibility: visible; }
+  #print-area { position: absolute; top: 0; left: 0; right: 0; padding: 10px; background: white; }
+  .no-print { display: none !important; }
+  .rpt-section { break-inside: auto; margin-bottom: 16px; border: 1px solid #ccc; }
+  .rpt-section table tr { page-break-inside: avoid; }
+  .rpt-header { background: #0F6E56 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .topbar, .tabs, .toolbar { display: none !important; }
+}
+
 .setup-screen{position:fixed;inset:0;background:var(--gray-bg);z-index:999;display:flex;align-items:center;justify-content:center;padding:20px;}
 .setup-card{background:var(--white);border:1px solid var(--gray-border);border-radius:var(--radius-lg);padding:32px 28px;width:420px;max-width:100%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.1);}
 .logo-preview{width:56px;height:56px;border-radius:10px;object-fit:cover;border:1px solid var(--gray-border);}
+
+/* PIN LOCK */
+.lock-screen{position:fixed;inset:0;background:var(--green-dark);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;}
+.lock-card{background:var(--white);border-radius:var(--radius-lg);padding:36px 28px;width:340px;max-width:100%;text-align:center;box-shadow:0 12px 48px rgba(0,0,0,.25);}
+.lock-card h2{font-size:18px;font-weight:700;margin-bottom:6px;}
+.lock-card p{font-size:13px;color:var(--text-muted);margin-bottom:24px;}
+.pin-dots{display:flex;justify-content:center;gap:12px;margin-bottom:24px;}
+.pin-dot{width:14px;height:14px;border-radius:50%;background:var(--gray-border);transition:background .15s;}
+.pin-dot.filled{background:var(--green);}
+.pin-dot.error{background:var(--red);}
+.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:240px;margin:0 auto;}
+.pin-btn{font-family:'Tajawal',sans-serif;font-size:20px;font-weight:600;padding:16px;border:1px solid var(--gray-border);border-radius:var(--radius);background:var(--white);cursor:pointer;transition:background .1s;color:var(--text);}
+.pin-btn:hover{background:var(--green-light);}
+.pin-btn:active{background:var(--green);color:#fff;}
+.pin-btn.zero{grid-column:2;}
+.pin-btn.del{font-size:16px;color:var(--text-muted);}
+.lock-error{font-size:13px;color:var(--red);margin-top:12px;min-height:20px;}
+
+/* BACKUP TOAST */
+.backup-toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--green-dark);color:#fff;padding:10px 20px;border-radius:99px;font-size:13px;font-family:'Tajawal',sans-serif;z-index:500;transition:transform .3s ease;white-space:nowrap;}
+.backup-toast.show{transform:translateX(-50%) translateY(0);}
+
+/* TOAST SYSTEM */
+.toast-container{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:600;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none;}
+.toast{padding:10px 20px;border-radius:99px;font-size:13px;font-family:'Tajawal',sans-serif;color:#fff;box-shadow:0 4px 16px rgba(0,0,0,.2);opacity:0;transform:translateY(20px);transition:all .3s ease;white-space:nowrap;pointer-events:none;}
+.toast.show{opacity:1;transform:translateY(0);}
+.toast.success{background:var(--green-dark);}
+.toast.error{background:var(--red);}
+.toast.info{background:var(--blue);}
+.toast.warn{background:var(--amber);}
+
+/* CONFIRM DIALOG */
+.confirm-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:400;align-items:center;justify-content:center;}
+.confirm-overlay.open{display:flex;}
+.confirm-box{background:var(--white);border-radius:var(--radius-lg);padding:24px;width:360px;max-width:94vw;box-shadow:0 8px 32px rgba(0,0,0,.2);text-align:center;}
+.confirm-icon{font-size:40px;margin-bottom:12px;}
+.confirm-title{font-size:16px;font-weight:700;margin-bottom:6px;}
+.confirm-msg{font-size:13px;color:var(--text-muted);line-height:1.7;margin-bottom:20px;white-space:pre-line;}
+.confirm-btns{display:flex;gap:8px;justify-content:center;}
+
+.stat-progress{height:4px;background:var(--gray-border);border-radius:99px;margin-top:6px;}
+.stat-progress-fill{height:4px;border-radius:99px;transition:width .4s ease;}
+
+.empty-state{text-align:center;padding:48px 20px;}
+.empty-state-icon{font-size:52px;margin-bottom:14px;opacity:.4;}
+.empty-state-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px;}
+.empty-state-sub{font-size:13px;color:var(--text-muted);line-height:1.7;}
+
+/* PAID DATE BADGE */
+.paid-date{font-size:10px;color:var(--text-muted);margin-top:2px;display:block;}
 </style>
 </head>
 <body>
@@ -140,6 +234,18 @@ textarea.copybox{font-family:monospace;font-size:13px;padding:10px;border:1px so
     <div class="form-group" style="text-align:right;">
       <label>اسم المركز</label>
       <input type="text" id="setup-name" placeholder="مثال: مركز نور القرآن" style="margin-bottom:12px;"/>
+      <label>رمز الدخول PIN (اختياري)</label>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;color:var(--text-muted);">
+          <input type="checkbox" id="setup-pin-toggle" onchange="toggleSetupPin(this)" style="width:auto;accent-color:var(--green);width:16px;height:16px;"/>
+          تفعيل رمز الدخول
+        </label>
+      </div>
+      <div id="setup-pin-wrap" style="display:none;">
+        <input type="password" id="setup-pin" placeholder="أدخلي 4 أرقام" dir="ltr" maxlength="4" inputmode="numeric"
+          oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,4)" style="margin-bottom:4px;letter-spacing:8px;font-size:20px;text-align:center;"/>
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:12px;">🔒 سيُطلب هذا الرمز عند كل فتح للتطبيق</div>
+      </div>
       <label>الشعار (اختياري)</label>
       <label class="btn" style="cursor:pointer;width:100%;justify-content:center;margin-bottom:8px;">
         📷 اختيار صورة
@@ -150,6 +256,54 @@ textarea.copybox{font-family:monospace;font-size:13px;padding:10px;border:1px so
       </div>
     </div>
     <button class="btn primary" style="width:100%;justify-content:center;margin-top:8px;" onclick="saveSetup()">🚀 ابدأي الآن</button>
+  </div>
+</div>
+
+<!-- PIN LOCK SCREEN -->
+<div class="lock-screen" id="lock-screen" style="display:none;">
+  <div class="lock-card">
+    <div style="font-size:40px;margin-bottom:10px;">🔒</div>
+    <h2 id="lock-title">أدخلي رمز الدخول</h2>
+    <p id="lock-subtitle">مركز التحفيظ</p>
+    <div class="pin-dots" id="pin-dots">
+      <div class="pin-dot" id="dot-0"></div>
+      <div class="pin-dot" id="dot-1"></div>
+      <div class="pin-dot" id="dot-2"></div>
+      <div class="pin-dot" id="dot-3"></div>
+    </div>
+    <div class="pin-pad">
+      <button class="pin-btn" onclick="pinPress('1')">1</button>
+      <button class="pin-btn" onclick="pinPress('2')">2</button>
+      <button class="pin-btn" onclick="pinPress('3')">3</button>
+      <button class="pin-btn" onclick="pinPress('4')">4</button>
+      <button class="pin-btn" onclick="pinPress('5')">5</button>
+      <button class="pin-btn" onclick="pinPress('6')">6</button>
+      <button class="pin-btn" onclick="pinPress('7')">7</button>
+      <button class="pin-btn" onclick="pinPress('8')">8</button>
+      <button class="pin-btn" onclick="pinPress('9')">9</button>
+      <button class="pin-btn zero" onclick="pinPress('0')">0</button>
+      <button class="pin-btn del" onclick="pinDel()">⌫</button>
+    </div>
+    <div class="lock-error" id="lock-error"></div>
+    <div style="margin-top:18px;">
+      <button class="btn sm" style="color:var(--text-muted);font-size:11px;" onclick="showPinReset()">نسيت الرمز؟</button>
+    </div>
+  </div>
+</div>
+
+<div class="backup-toast" id="backup-toast">✅ تم حفظ نسخة احتياطية تلقائياً</div>
+<div class="toast-container" id="toast-container"></div>
+
+<!-- CONFIRM DIALOG -->
+<div class="confirm-overlay" id="confirm-overlay">
+  <div class="confirm-box">
+    <div class="confirm-icon" id="confirm-icon">⚠️</div>
+    <div class="confirm-title" id="confirm-title">تأكيد</div>
+    <div class="confirm-msg" id="confirm-msg"></div>
+    <div class="confirm-btns">
+      <button class="btn" id="confirm-cancel-btn" onclick="resolveConfirm(false)">إلغاء</button>
+      <button class="btn" id="confirm-ok-btn" onclick="resolveConfirm(true)">تأكيد</button>
+    </div>
   </div>
 </div>
 
@@ -169,6 +323,20 @@ textarea.copybox{font-family:monospace;font-size:13px;padding:10px;border:1px so
       </label>
       <div id="cs-logo-preview" style="margin-top:8px;"></div>
     </div>
+    <div class="form-group">
+      <label>رمز الدخول PIN</label>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;color:var(--text-muted);">
+          <input type="checkbox" id="cs-pin-toggle" onchange="toggleCsPin(this)" style="width:auto;accent-color:var(--green);width:16px;height:16px;"/>
+          تفعيل رمز الدخول
+        </label>
+      </div>
+      <div id="cs-pin-wrap" style="display:none;">
+        <input type="password" id="cs-pin" placeholder="أدخلي رمز جديد — 4 أرقام" dir="ltr" maxlength="4" inputmode="numeric"
+          oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,4)" style="letter-spacing:8px;font-size:18px;text-align:center;"/>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">اتركيه فارغاً للإبقاء على الرمز الحالي</div>
+      </div>
+    </div>
     <div class="modal-footer">
       <button class="btn danger" onclick="if(confirm('سيتم مسح كل البيانات. متابعة؟')){localStorage.clear();location.reload();}">🗑 إعادة ضبط</button>
       <button class="btn" onclick="closeOverlay('center-settings-overlay')">إلغاء</button>
@@ -186,15 +354,23 @@ textarea.copybox{font-family:monospace;font-size:13px;padding:10px;border:1px so
     </div>
   </div>
   <div class="topbar-actions">
-    <button class="btn" onclick="openCenterSettings()">⚙ المركز</button>
-    <button class="btn" style="color:var(--blue);border-color:var(--blue);" onclick="openRenewalModal()">🔄 تجديد الفصل</button>
-    <button class="btn" onclick="exportData()">💾 حفظ البيانات</button>
-    <label class="btn amber" style="cursor:pointer;">
-      📂 استيراد بيانات
-      <input type="file" accept=".json" onchange="importData(event)" style="display:none"/>
-    </label>
+    <div class="dropdown" id="main-dropdown">
+      <button class="btn primary" onclick="toggleDropdown()">☰ القائمة ▾</button>
+      <div class="dropdown-menu" id="main-dropdown-menu">
+        <button class="dropdown-item" onclick="closeDropdown();openCenterSettings()">⚙️ إعدادات المركز</button>
+        <button class="dropdown-item blue" onclick="closeDropdown();openRenewalModal()">🔄 تجديد الفصل</button>
+        <div class="dropdown-divider"></div>
+        <button class="dropdown-item" onclick="closeDropdown();exportData()">💾 حفظ البيانات</button>
+        <button class="dropdown-item" onclick="closeDropdown();openBackupManager()">📦 النسخ الاحتياطية</button>
+        <label class="dropdown-item" style="cursor:pointer;">
+          📂 استيراد بيانات
+          <input type="file" accept=".json" onchange="closeDropdown();importData(event)" style="display:none"/>
+        </label>
+        <div class="dropdown-divider"></div>
+        <button class="dropdown-item danger" onclick="closeDropdown();confirmDeleteAll()">🗑 مسح البيانات</button>
+      </div>
+    </div>
     <button class="btn wa" onclick="openBulkModal()">📲 تذكير الكل</button>
-    <button class="btn danger" onclick="confirmDeleteAll()">🗑 مسح البيانات</button>
   </div>
 </div>
 
@@ -202,6 +378,7 @@ textarea.copybox{font-family:monospace;font-size:13px;padding:10px;border:1px so
   <button class="tab active" onclick="showPage('students',this)">👩‍🎓 الطالبات</button>
   <button class="tab" onclick="showPage('halaqat',this)">📚 الحلقات</button>
   <button class="tab" onclick="showPage('dourat',this)">🌟 الدورات والأنشطة</button>
+  <button class="tab" onclick="showPage('reports',this)">📊 التقارير</button>
   <button class="tab" onclick="showPage('archive',this)">📦 الأرشيف</button>
 </div>
 
@@ -210,17 +387,21 @@ textarea.copybox{font-family:monospace;font-size:13px;padding:10px;border:1px so
   <div class="container">
     <div class="stats" id="stats"></div>
     <div class="toolbar">
-      <div class="search-wrap">
-        <span class="search-icon">🔍</span>
-        <input type="text" id="search" placeholder="بحث بالاسم أو رقم الهاتف أو رقم المستخدم..." oninput="renderStudents()"/>
+      <div class="toolbar-row">
+        <div class="search-wrap" style="flex:1;">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="search" placeholder="🔍 بحث بالاسم أو الهاتف أو رقم المستخدم..." oninput="debouncedRenderStudents()"/>
+        </div>
       </div>
-      <select id="filter-halaqa" onchange="renderStudents()" style="width:auto;min-width:130px;"></select>
-      <select id="filter-paid" onchange="renderStudents()" style="width:auto;min-width:140px;">
-        <option value="all">كل الحالات</option>
-        <option value="unpaid">فيها دفعات متأخرة</option>
-        <option value="paid">مكتملة الدفع</option>
-      </select>
-      <button class="btn primary" onclick="openStudentModal()">+ إضافة طالبة</button>
+      <div class="toolbar-row">
+        <select id="filter-halaqa" onchange="renderStudents()" style="flex:1;min-width:120px;"></select>
+        <select id="filter-paid" onchange="renderStudents()" style="flex:1;min-width:130px;">
+          <option value="all">كل الحالات</option>
+          <option value="unpaid">فيها دفعات متأخرة</option>
+          <option value="paid">مكتملة الدفع</option>
+        </select>
+        <button class="btn primary" onclick="openStudentModal()">+ إضافة طالبة</button>
+      </div>
     </div>
     <div id="students-list"></div>
     <p class="export-note">البيانات محفوظة تلقائياً على هذا الجهاز — استخدمي زر "حفظ البيانات" للنقل بين الأجهزة ✓</p>
@@ -234,12 +415,10 @@ textarea.copybox{font-family:monospace;font-size:13px;padding:10px;border:1px so
       <div class="section-title">الحلقات المسجلة</div>
       <button class="btn primary" onclick="openHalaqaModal()">+ إضافة حلقة</button>
     </div>
-    <div class="card">
-      <table>
+    <div class="card" style="overflow-x:auto;">
+      <table style="min-width:600px;">
         <thead>
-          <tr>
-            <th>#</th><th>اسم الحلقة</th><th>المعلمة</th><th>المشرفة</th><th>المبلغ الفصلي</th><th>عدد الطالبات</th><th>إجراءات</th>
-          </tr>
+          <tr><th>#</th><th>اسم الحلقة</th><th>المعلمة</th><th>المشرفة</th><th>المبلغ الفصلي</th><th>عدد الطالبات</th><th>إجراءات</th></tr>
         </thead>
         <tbody id="halaqat-tbody"></tbody>
       </table>
@@ -256,10 +435,24 @@ textarea.copybox{font-family:monospace;font-size:13px;padding:10px;border:1px so
       <button class="btn primary" onclick="openDauratModal()">+ إضافة دورة / نشاط</button>
       <button class="btn" style="color:var(--green-dark);border-color:var(--green-dark);" onclick="openExcelImportModal()">📊 استيراد Excel</button>
     </div>
-
-    <!-- Dourat list -->
     <div id="dourat-list"></div>
     <p class="export-note">البيانات محفوظة تلقائياً ✓</p>
+  </div>
+</div>
+
+<!-- REPORTS PAGE -->
+<div class="page" id="page-reports">
+  <div class="container">
+    <div class="toolbar" style="margin-bottom:16px;">
+      <select id="rpt-filter" onchange="renderReports()" style="width:auto;min-width:160px;">
+        <option value="all">📊 كل التقارير</option>
+        <option value="halaqat">📚 الحلقات فقط</option>
+        <option value="dourat">🌟 الدورات فقط</option>
+      </select>
+      <button class="btn primary" onclick="printReport()">🖨 طباعة / PDF</button>
+      <button class="btn" style="color:var(--green-dark);border-color:var(--green-dark);" onclick="exportReportExcel()">📊 تصدير Excel</button>
+    </div>
+    <div id="report-content"></div>
   </div>
 </div>
 
@@ -269,52 +462,33 @@ textarea.copybox{font-family:monospace;font-size:13px;padding:10px;border:1px so
     <div class="section-header" style="margin-bottom:6px;">
       <div class="section-title">📦 الحلقات المؤرشفة</div>
     </div>
-    <div class="card" style="margin-bottom:20px;">
-      <table>
-        <thead>
-          <tr><th>#</th><th>اسم الحلقة</th><th>المبلغ</th><th>عدد الطالبات</th><th>إجراءات</th></tr>
-        </thead>
+    <div class="card" style="margin-bottom:20px;overflow-x:auto;">
+      <table style="min-width:500px;">
+        <thead><tr><th>#</th><th>اسم الحلقة</th><th>المبلغ</th><th>عدد الطالبات</th><th>إجراءات</th></tr></thead>
         <tbody id="archive-tbody"></tbody>
       </table>
     </div>
     <div class="section-header" style="margin-bottom:6px;">
       <div class="section-title">📦 الدورات والأنشطة المؤرشفة</div>
     </div>
-    <div class="card">
-      <table>
-        <thead>
-          <tr><th>#</th><th>اسم الدورة</th><th>المبلغ</th><th>المسجلات</th><th>إجراءات</th></tr>
-        </thead>
+    <div class="card" style="overflow-x:auto;">
+      <table style="min-width:500px;">
+        <thead><tr><th>#</th><th>اسم الدورة</th><th>المبلغ</th><th>المسجلات</th><th>إجراءات</th></tr></thead>
         <tbody id="archive-dourat-tbody"></tbody>
       </table>
     </div>
   </div>
 </div>
+
+<!-- STUDENT MODAL -->
 <div class="overlay" id="student-overlay" onclick="overlayClick('student-overlay',event)">
   <div class="modal" onclick="event.stopPropagation()">
     <h2 id="student-modal-title">إضافة طالبة جديدة</h2>
-    <div class="form-group">
-      <label>اسم الطالبة</label>
-      <input type="text" id="f-name" placeholder="الاسم الكامل"/>
-    </div>
-    <div class="form-group">
-      <label>رقم المستخدم (برنامج إقراء)</label>
-      <input type="text" id="f-userid" placeholder="12345678" dir="ltr" maxlength="8" inputmode="numeric"
-        oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,8)"/>
-    </div>
-    <div class="form-group">
-      <label>رقم الهاتف (8 أرقام - إنجليزي)</label>
-      <input type="text" id="f-phone" placeholder="12345678" dir="ltr" maxlength="8" inputmode="numeric"
-        oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,8)"/>
-    </div>
-    <div class="form-group">
-      <label>ملاحظة (اختياري)</label>
-      <input type="text" id="f-note" placeholder="مثال: مسجلة في حلقتين"/>
-    </div>
-    <div class="form-group">
-      <label>الحلقات المسجلة فيها</label>
-      <div class="halaqa-check-list" id="halaqa-checklist"></div>
-    </div>
+    <div class="form-group"><label>اسم الطالبة</label><input type="text" id="f-name" placeholder="الاسم الكامل"/></div>
+    <div class="form-group"><label>رقم المستخدم (برنامج إقراء)</label><input type="text" id="f-userid" placeholder="12345678" dir="ltr" maxlength="8" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,8)"/></div>
+    <div class="form-group"><label>رقم الهاتف (8 أرقام - إنجليزي)</label><input type="text" id="f-phone" placeholder="12345678" dir="ltr" maxlength="8" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,8)"/></div>
+    <div class="form-group"><label>ملاحظة (اختياري)</label><input type="text" id="f-note" placeholder="مثال: مسجلة في حلقتين"/></div>
+    <div class="form-group"><label>الحلقات المسجلة فيها</label><div class="halaqa-check-list" id="halaqa-checklist"></div></div>
     <div class="modal-footer">
       <button class="btn" onclick="closeOverlay('student-overlay')">إلغاء</button>
       <button class="btn primary" onclick="saveStudent()">💾 حفظ</button>
@@ -326,22 +500,10 @@ textarea.copybox{font-family:monospace;font-size:13px;padding:10px;border:1px so
 <div class="overlay" id="halaqa-overlay" onclick="overlayClick('halaqa-overlay',event)">
   <div class="modal" onclick="event.stopPropagation()">
     <h2 id="halaqa-modal-title">إضافة حلقة جديدة</h2>
-    <div class="form-group">
-      <label>اسم الحلقة</label>
-      <input type="text" id="h-name" placeholder="مثال: حلقة الفجر"/>
-    </div>
-    <div class="form-group">
-      <label>اسم المعلمة</label>
-      <input type="text" id="h-teacher" placeholder="مثال: أم عبدالله"/>
-    </div>
-    <div class="form-group">
-      <label>اسم المشرفة</label>
-      <input type="text" id="h-supervisor" placeholder="مثال: أم محمد"/>
-    </div>
-    <div class="form-group">
-      <label>المبلغ الفصلي (دينار)</label>
-      <input type="number" id="h-amount" placeholder="10" min="0"/>
-    </div>
+    <div class="form-group"><label>اسم الحلقة</label><input type="text" id="h-name" placeholder="مثال: حلقة الفجر"/></div>
+    <div class="form-group"><label>اسم المعلمة</label><input type="text" id="h-teacher" placeholder="مثال: أم عبدالله"/></div>
+    <div class="form-group"><label>اسم المشرفة</label><input type="text" id="h-supervisor" placeholder="مثال: أم محمد"/></div>
+    <div class="form-group"><label>المبلغ الفصلي (د.ب)</label><input type="number" id="h-amount" placeholder="10" min="0"/></div>
     <div class="modal-footer">
       <button class="btn" onclick="closeOverlay('halaqa-overlay')">إلغاء</button>
       <button class="btn primary" onclick="saveHalaqa()">💾 حفظ</button>
@@ -358,9 +520,7 @@ textarea.copybox{font-family:monospace;font-size:13px;padding:10px;border:1px so
       <button class="btn sm" onclick="closeOverlay('bulk-overlay');openMsgModal()">✏ تعديل الرسالة</button>
     </div>
     <div id="bulk-list" style="display:flex;flex-direction:column;gap:7px;max-height:360px;overflow-y:auto;"></div>
-    <div class="modal-footer">
-      <button class="btn" onclick="closeOverlay('bulk-overlay')">إغلاق</button>
-    </div>
+    <div class="modal-footer"><button class="btn" onclick="closeOverlay('bulk-overlay')">إغلاق</button></div>
   </div>
 </div>
 
@@ -373,41 +533,42 @@ textarea.copybox{font-family:monospace;font-size:13px;padding:10px;border:1px so
       <textarea id="wa-msg-text" rows="6" style="width:100%;font-size:14px;padding:10px;border:1px solid var(--gray-border);border-radius:var(--radius);font-family:'Tajawal',sans-serif;resize:vertical;"></textarea>
     </div>
     <div class="modal-footer">
-      <button class="btn sm" onclick="document.getElementById('wa-msg-text').value='السلام عليكم ورحمة الله وبركاته\nنذكّركم بسداد رسوم التسجيل في مركز شيخان وشريفة الفارسي للنساء، شاكرين لكم تعاونكم 🌸\nجزاكم الله خيراً وبارك فيكم.'">↩ افتراضي</button>
+      <button class="btn sm" onclick="document.getElementById('wa-msg-text').value='السلام عليكم ورحمة الله وبركاته\nنذكّركم بسداد رسوم التسجيل\nجزاكم الله خيراً وبارك فيكم.'">↩ افتراضي</button>
       <button class="btn" onclick="closeOverlay('msg-overlay')">إلغاء</button>
       <button class="btn primary" onclick="saveMsgTemplate()">💾 حفظ</button>
     </div>
   </div>
 </div>
 
-<!-- IMPORT CONFIRM MODAL -->
+<!-- IMPORT MODAL -->
 <div class="overlay" id="import-overlay">
-  <div class="modal" style="width:360px;" onclick="event.stopPropagation()">
+  <div class="modal" style="width:400px;" onclick="event.stopPropagation()">
     <h2>📂 استيراد بيانات</h2>
-    <p style="font-size:14px;line-height:1.8;margin-bottom:14px;">سيتم استبدال البيانات الحالية بالبيانات المستوردة.<br/>هل أنت متأكدة؟</p>
+    <div id="import-file-info" style="background:var(--gray-bg);border-radius:var(--radius);padding:10px 12px;margin-bottom:14px;font-size:13px;line-height:1.8;color:var(--text-muted);"></div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">
+      <label style="display:flex;align-items:flex-start;gap:10px;padding:12px;border:2px solid var(--green);border-radius:var(--radius);cursor:pointer;background:var(--green-light);">
+        <input type="radio" name="import-mode" value="merge" checked style="width:auto;margin-top:2px;accent-color:var(--green);"/>
+        <div><div style="font-weight:600;font-size:13px;color:var(--green-dark);">➕ دمج وإضافة (موصى به)</div><div style="font-size:12px;color:var(--text-muted);margin-top:2px;">يضيف البيانات الجديدة فوق الموجودة</div></div>
+      </label>
+      <label style="display:flex;align-items:flex-start;gap:10px;padding:12px;border:1px solid var(--gray-border);border-radius:var(--radius);cursor:pointer;">
+        <input type="radio" name="import-mode" value="replace" style="width:auto;margin-top:2px;accent-color:var(--red);"/>
+        <div><div style="font-weight:600;font-size:13px;color:var(--red);">🔄 استبدال كامل</div><div style="font-size:12px;color:var(--text-muted);margin-top:2px;">يمسح كل البيانات الحالية — لا يمكن التراجع</div></div>
+      </label>
+    </div>
     <div class="modal-footer">
       <button class="btn" onclick="closeOverlay('import-overlay')">إلغاء</button>
-      <button class="btn danger" id="import-confirm-btn">استبدال البيانات</button>
+      <button class="btn primary" id="import-confirm-btn">✅ استيراد</button>
     </div>
   </div>
 </div>
 
-<!-- DOURA MODAL (add/edit doura) -->
+<!-- DOURA MODAL -->
 <div class="overlay" id="doura-overlay" onclick="overlayClick('doura-overlay',event)">
   <div class="modal" onclick="event.stopPropagation()">
     <h2 id="doura-modal-title">إضافة دورة / نشاط جديد</h2>
-    <div class="form-group">
-      <label>اسم الدورة أو النشاط</label>
-      <input type="text" id="d-name" placeholder="مثال: دورة المهرة"/>
-    </div>
-    <div class="form-group">
-      <label>تاريخ البدء (اختياري)</label>
-      <input type="text" id="d-date" placeholder="مثال: يوليو 2025"/>
-    </div>
-    <div class="form-group">
-      <label>ملاحظة (اختياري)</label>
-      <input type="text" id="d-note" placeholder="أي تفاصيل إضافية..."/>
-    </div>
+    <div class="form-group"><label>اسم الدورة أو النشاط</label><input type="text" id="d-name" placeholder="مثال: دورة المهرة"/></div>
+    <div class="form-group"><label>تاريخ البدء (اختياري)</label><input type="text" id="d-date" placeholder="مثال: يوليو 2025"/></div>
+    <div class="form-group"><label>ملاحظة (اختياري)</label><input type="text" id="d-note" placeholder="أي تفاصيل إضافية..."/></div>
     <div class="form-group">
       <label>الأقسام والرسوم</label>
       <div id="d-sections-list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;"></div>
@@ -420,34 +581,16 @@ textarea.copybox{font-family:monospace;font-size:13px;padding:10px;border:1px so
   </div>
 </div>
 
-<!-- DOURA STUDENT MODAL (add student to doura) -->
+<!-- DOURA STUDENT MODAL -->
 <div class="overlay" id="doura-student-overlay" onclick="overlayClick('doura-student-overlay',event)">
   <div class="modal" onclick="event.stopPropagation()">
     <h2 id="doura-student-title">إضافة مسجلة</h2>
-    <div class="form-group">
-      <label>اسم الطالبة</label>
-      <input type="text" id="ds-name" placeholder="الاسم الكامل"/>
-    </div>
-    <div class="form-group">
-      <label>رقم الهاتف</label>
-      <input type="text" id="ds-phone" placeholder="05xxxxxxxx" dir="ltr"/>
-    </div>
-    <div class="form-group">
-      <label>الرقم الشخصي (اختياري)</label>
-      <input type="text" id="ds-personalid" placeholder="الرقم الشخصي" dir="ltr"/>
-    </div>
-    <div class="form-group">
-      <label>اسم المركز (اختياري)</label>
-      <input type="text" id="ds-center" placeholder="للمسجلات من خارج المركز"/>
-    </div>
-    <div class="form-group">
-      <label>القسم المسجلة فيه</label>
-      <select id="ds-section"></select>
-    </div>
-    <div class="form-group">
-      <label>ملاحظة (اختياري)</label>
-      <input type="text" id="ds-note" placeholder=""/>
-    </div>
+    <div class="form-group"><label>اسم الطالبة</label><input type="text" id="ds-name" placeholder="الاسم الكامل"/></div>
+    <div class="form-group"><label>رقم الهاتف</label><input type="text" id="ds-phone" placeholder="05xxxxxxxx" dir="ltr"/></div>
+    <div class="form-group"><label>الرقم الشخصي (اختياري)</label><input type="text" id="ds-personalid" placeholder="الرقم الشخصي" dir="ltr"/></div>
+    <div class="form-group"><label>اسم المركز (اختياري)</label><input type="text" id="ds-center" placeholder="للمسجلات من خارج المركز"/></div>
+    <div class="form-group"><label>القسم المسجلة فيه</label><select id="ds-section"></select></div>
+    <div class="form-group"><label>ملاحظة (اختياري)</label><input type="text" id="ds-note" placeholder=""/></div>
     <div class="modal-footer">
       <button class="btn" onclick="closeOverlay('doura-student-overlay')">إلغاء</button>
       <button class="btn primary" onclick="saveDouraStudent()">💾 حفظ</button>
@@ -472,8 +615,7 @@ textarea.copybox{font-family:monospace;font-size:13px;padding:10px;border:1px so
     </div>
     <div id="renewal-summary" style="font-size:13px;color:var(--text-muted);margin-bottom:16px;line-height:1.8;"></div>
     <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">
-      سيتم تحويل كل الطالبات <strong>النشطات</strong> إلى "لم تدفع".<br/>
-      الطالبات المتوقفات لن تتأثر.
+      سيتم تحويل كل الطالبات <strong>النشطات</strong> إلى "لم تدفع".<br/>الطالبات المتوقفات لن تتأثر.
     </div>
     <div class="modal-footer">
       <button class="btn" onclick="closeOverlay('renewal-overlay')">إلغاء</button>
@@ -482,24 +624,14 @@ textarea.copybox{font-family:monospace;font-size:13px;padding:10px;border:1px so
   </div>
 </div>
 
-
-<!-- ENROLL IN DOURA MODAL -->
+<!-- ENROLL MODAL -->
 <div class="overlay" id="enroll-overlay" onclick="overlayClick('enroll-overlay',event)">
   <div class="modal" style="width:400px;" onclick="event.stopPropagation()">
     <h2>🌟 تسجيل في دورة</h2>
     <div id="enroll-student-name" style="font-size:14px;font-weight:600;margin-bottom:14px;color:var(--green-dark);"></div>
-    <div class="form-group">
-      <label>اختاري الدورة</label>
-      <select id="enroll-doura-select" onchange="updateEnrollSections()"></select>
-    </div>
-    <div class="form-group">
-      <label>القسم</label>
-      <select id="enroll-section-select"></select>
-    </div>
-    <div class="form-group">
-      <label>ملاحظة (اختياري)</label>
-      <input type="text" id="enroll-note" placeholder=""/>
-    </div>
+    <div class="form-group"><label>اختاري الدورة</label><select id="enroll-doura-select" onchange="updateEnrollSections()"></select></div>
+    <div class="form-group"><label>القسم</label><select id="enroll-section-select"></select></div>
+    <div class="form-group"><label>ملاحظة (اختياري)</label><input type="text" id="enroll-note" placeholder=""/></div>
     <div class="modal-footer">
       <button class="btn" onclick="closeOverlay('enroll-overlay')">إلغاء</button>
       <button class="btn primary" onclick="confirmEnroll()">✅ تسجيل</button>
@@ -507,9 +639,7 @@ textarea.copybox{font-family:monospace;font-size:13px;padding:10px;border:1px so
   </div>
 </div>
 
-
-
-<!-- FEE TYPE MODAL (للحلقات) -->
+<!-- FEE TYPE MODAL (حلقات) -->
 <div class="overlay" id="feetype-overlay" onclick="overlayClick('feetype-overlay',event)">
   <div class="modal" style="width:380px;" onclick="event.stopPropagation()">
     <h2>⚙ نوع الرسوم</h2>
@@ -524,7 +654,7 @@ textarea.copybox{font-family:monospace;font-size:13px;padding:10px;border:1px so
       </select>
     </div>
     <div class="form-group" id="feetype-amount-group" style="display:none;">
-      <label id="feetype-amount-label">المبلغ (دينار)</label>
+      <label id="feetype-amount-label">المبلغ (د.ب)</label>
       <input type="number" id="feetype-amount" placeholder="0" min="0"/>
     </div>
     <div class="modal-footer">
@@ -534,7 +664,7 @@ textarea.copybox{font-family:monospace;font-size:13px;padding:10px;border:1px so
   </div>
 </div>
 
-<!-- FEE TYPE MODAL (للدورات) -->
+<!-- FEE TYPE MODAL (دورات) -->
 <div class="overlay" id="doura-feetype-overlay" onclick="overlayClick('doura-feetype-overlay',event)">
   <div class="modal" style="width:380px;" onclick="event.stopPropagation()">
     <h2>⚙ نوع الرسوم</h2>
@@ -549,7 +679,7 @@ textarea.copybox{font-family:monospace;font-size:13px;padding:10px;border:1px so
       </select>
     </div>
     <div class="form-group" id="doura-feetype-amount-group" style="display:none;">
-      <label id="doura-feetype-amount-label">المبلغ (دينار)</label>
+      <label id="doura-feetype-amount-label">المبلغ (د.ب)</label>
       <input type="number" id="doura-feetype-amount" placeholder="0" min="0"/>
     </div>
     <div class="modal-footer">
@@ -559,19 +689,12 @@ textarea.copybox{font-family:monospace;font-size:13px;padding:10px;border:1px so
   </div>
 </div>
 
-
-
 <!-- EXCEL IMPORT MODAL -->
 <div class="overlay" id="excel-import-overlay" onclick="overlayClick('excel-import-overlay',event)">
   <div class="modal" style="width:500px;max-height:90vh;overflow-y:auto;" onclick="event.stopPropagation()">
     <h2>📊 استيراد من Excel</h2>
-
-    <!-- Step 1: Choose file and doura -->
     <div id="excel-step1">
-      <div class="form-group">
-        <label>اختاري الدورة المستهدفة</label>
-        <select id="excel-doura-select" style="width:100%;"></select>
-      </div>
+      <div class="form-group"><label>اختاري الدورة المستهدفة</label><select id="excel-doura-select" style="width:100%;"></select></div>
       <div class="form-group">
         <label>ارفعي ملف Excel أو CSV</label>
         <label class="btn" style="cursor:pointer;width:100%;justify-content:center;">
@@ -581,21 +704,15 @@ textarea.copybox{font-family:monospace;font-size:13px;padding:10px;border:1px so
         <div id="excel-file-name" style="font-size:12px;color:var(--text-muted);margin-top:6px;text-align:center;"></div>
       </div>
     </div>
-
-    <!-- Step 2: Map columns -->
     <div id="excel-step2" style="display:none;">
       <div style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">طابقي الأعمدة من ملفك:</div>
       <div class="form-group"><label>عمود اسم الطالبة *</label><select id="map-name"></select></div>
       <div class="form-group"><label>عمود رقم الهاتف</label><select id="map-phone"></select></div>
       <div class="form-group"><label>عمود الرقم الشخصي</label><select id="map-personalid"></select></div>
       <div class="form-group"><label>عمود اسم المركز</label><select id="map-center"></select></div>
-      <div class="form-group">
-        <label>القسم المسجلة فيه</label>
-        <select id="excel-section-select"></select>
-      </div>
+      <div class="form-group"><label>القسم المسجلة فيه</label><select id="excel-section-select"></select></div>
       <div id="excel-preview" style="margin-top:12px;font-size:12px;color:var(--text-muted);background:var(--gray-bg);border-radius:var(--radius);padding:10px;max-height:150px;overflow-y:auto;"></div>
     </div>
-
     <div class="modal-footer">
       <button class="btn" onclick="closeOverlay('excel-import-overlay')">إلغاء</button>
       <button class="btn primary" id="excel-import-btn" style="display:none;" onclick="confirmExcelImport()">✅ استيراد</button>
@@ -604,6 +721,7 @@ textarea.copybox{font-family:monospace;font-size:13px;padding:10px;border:1px so
 </div>
 
 <script>
+// ===================== DATA =====================
 let halaqat = JSON.parse(localStorage.getItem('hifz_halaqat') || '[]');
 let archivedHalaqat = JSON.parse(localStorage.getItem('hifz_archive') || '[]');
 let students = JSON.parse(localStorage.getItem('hifz_students_v3') || '[]');
@@ -612,147 +730,23 @@ let semester = localStorage.getItem('hifz_semester') || 'الفصل الأول';
 let waTemplate = localStorage.getItem('hifz_wa_msg') || '';
 let centerName = localStorage.getItem('hifz_center_name') || '';
 let centerLogo = localStorage.getItem('hifz_center_logo') || '';
-let editStudentId = null;
-let editHalaqaId = null;
-let editDouraId = null;
-let editDouraStudentId = null;
-let activeDouraId = null;
-let pendingImport = null;
+let appPin = localStorage.getItem('hifz_pin') || '';
+let editStudentId = null, editHalaqaId = null, editDouraId = null;
+let editDouraStudentId = null, activeDouraId = null, pendingImport = null;
+let enrollStudentIdx = null;
+let feeTypeStudentIdx = null, feeTypeHid = null;
+let feeTypeDouraIdx = null, feeTypeStuIdx = null;
 
 const SEMESTERS = ['الفصل الأول', 'الفصل الثاني', 'الفصل الصيفي'];
 
-function saveData() {
-  localStorage.setItem('hifz_halaqat', JSON.stringify(halaqat));
-  localStorage.setItem('hifz_archive', JSON.stringify(archivedHalaqat));
-  localStorage.setItem('hifz_students_v3', JSON.stringify(students));
-  localStorage.setItem('hifz_dourat', JSON.stringify(dourat));
-  localStorage.setItem('hifz_semester', semester);
-  localStorage.setItem('hifz_wa_msg', waTemplate);
-  localStorage.setItem('hifz_center_name', centerName);
-  localStorage.setItem('hifz_center_logo', centerLogo);
-}
+// ===================== HELPERS =====================
+function uid() { return Math.random().toString(36).substr(2,9) + Date.now().toString(36); }
 
-function confirmDeleteAll() {
-  const step1 = confirm('⚠️ تحذير: سيتم حذف جميع بيانات الطالبات والحلقات والدورات.\n\nهل أنت متأكدة؟');
-  if (!step1) return;
-  const step2 = confirm('هذا الإجراء لا يمكن التراجع عنه.\n\nاكتبي "نعم" في المربع التالي للتأكيد.');
-  if (!step2) return;
-  const confirm3 = prompt('اكتبي كلمة "حذف" للتأكيد النهائي:');
-  if (confirm3 !== 'حذف') { alert('تم الإلغاء — البيانات محفوظة.'); return; }
-
-  halaqat = [];
-  archivedHalaqat = [];
-  students = [];
-  dourat = [];
-  saveData();
-  renderStudents();
-  alert('✅ تم مسح جميع البيانات.');
-}
-
-function nextSemester(current) {
-  const idx = SEMESTERS.indexOf(current);
-  return SEMESTERS[(idx + 1) % SEMESTERS.length];
-}
-
-function updateSemesterLabel() {
-  const el = document.getElementById('semester-label');
-  if (el) el.textContent = semester;
-}
-
-// CENTER SETTINGS
-function applyCenter() {
-  document.getElementById('topbar-center-name').textContent = centerName || 'مركز التحفيظ';
-  const logoWrap = document.getElementById('topbar-logo-wrap');
-  if (centerLogo) {
-    logoWrap.innerHTML = '<img src="'+centerLogo+'" style="width:36px;height:36px;border-radius:8px;object-fit:cover;"/>';
-  } else {
-    logoWrap.textContent = '\uD83D\uDCD6';
-  }
-}
-
-function previewSetupLogo(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    centerLogo = e.target.result;
-    document.getElementById('setup-logo-preview').style.display = 'block';
-    document.getElementById('setup-logo-img').src = centerLogo;
-  };
-  reader.readAsDataURL(file);
-}
-
-function saveSetup() {
-  const name = document.getElementById('setup-name').value.trim();
-  if (!name) { alert('يرجى إدخال اسم المركز'); return; }
-  centerName = name;
-  saveData();
-  applyCenter();
-  document.getElementById('setup-screen').style.display = 'none';
-}
-
-function openCenterSettings() {
-  document.getElementById('cs-name').value = centerName;
-  const prev = document.getElementById('cs-logo-preview');
-  prev.innerHTML = centerLogo ? '<img src="'+centerLogo+'" class="logo-preview"/>' : '';
-  openOverlay('center-settings-overlay');
-}
-
-function previewCsLogo(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    centerLogo = e.target.result;
-    document.getElementById('cs-logo-preview').innerHTML = '<img src="'+centerLogo+'" class="logo-preview"/>';
-  };
-  reader.readAsDataURL(file);
-}
-
-function saveCenterSettings() {
-  const name = document.getElementById('cs-name').value.trim();
-  if (!name) { alert('يرجى إدخال اسم المركز'); return; }
-  centerName = name;
-  saveData();
-  applyCenter();
-  closeOverlay('center-settings-overlay');
-}
-
-function openRenewalModal() {
-  document.getElementById('renewal-current').textContent = semester;
-  const sel = document.getElementById('renewal-select');
-  // preselect next semester
-  const idx = SEMESTERS.indexOf(semester);
-  sel.value = SEMESTERS[(idx+1) % SEMESTERS.length];
-  const active = students.filter(s => !s.paused);
-  const paused = students.filter(s => s.paused);
-  document.getElementById('renewal-summary').innerHTML =
-    `👩‍🎓 طالبات نشطات سيتم تصفير دفعهن: <strong>${active.length}</strong><br/>` +
-    `⏸ طالبات متوقفات لن تتأثر: <strong>${paused.length}</strong>`;
-  openOverlay('renewal-overlay');
-}
-
-function confirmRenewal() {
-  const selected = document.getElementById('renewal-select').value;
-  if (selected === semester) {
-    alert('يرجى اختيار فصل مختلف عن الحالي');
-    return;
-  }
-  semester = selected;
-  students.forEach(s => {
-    if (!s.paused) {
-      (s.halaqat || []).forEach(sh => sh.paid = false);
-    }
-  });
-  saveData();
-  updateSemesterLabel();
-  closeOverlay('renewal-overlay');
-  renderStudents();
-  alert(`✅ تم التجديد للـ ${semester} بنجاح!`);
-}
-
-function uid() {
-  return Math.random().toString(36).substr(2,9) + Date.now().toString(36);
+function fmtDate(iso) {
+  if (!iso) return '';
+  try {
+    return new Date(iso).toLocaleDateString('ar-BH', {day:'2-digit', month:'2-digit', year:'numeric'});
+  } catch(e) { return ''; }
 }
 
 function esc(str) {
@@ -763,16 +757,580 @@ function formatPhone(phone) {
   return String(phone||'').replace(/\D/g,'').replace(/^0/,'966');
 }
 
-// TABS
+function debounce(fn, ms=200) {
+  let t;
+  return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+}
+const debouncedRenderStudents = debounce(renderStudents, 220);
+
+// ===================== SAVE =====================
+function saveData() {
+  localStorage.setItem('hifz_halaqat', JSON.stringify(halaqat));
+  localStorage.setItem('hifz_archive', JSON.stringify(archivedHalaqat));
+  localStorage.setItem('hifz_students_v3', JSON.stringify(students));
+  localStorage.setItem('hifz_dourat', JSON.stringify(dourat));
+  localStorage.setItem('hifz_semester', semester);
+  localStorage.setItem('hifz_wa_msg', waTemplate);
+  localStorage.setItem('hifz_center_name', centerName);
+  localStorage.setItem('hifz_center_logo', centerLogo);
+  localStorage.setItem('hifz_pin', appPin);
+}
+
+// ===================== TOAST =====================
+function toast(msg, type='success', duration=3000) {
+  const container = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.textContent = msg;
+  container.appendChild(t);
+  requestAnimationFrame(() => { requestAnimationFrame(() => t.classList.add('show')); });
+  setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, duration);
+}
+
+// ===================== CONFIRM =====================
+let _confirmResolve = null;
+function showConfirm(title, msg, okText='تأكيد', okClass='danger', icon='⚠️') {
+  return new Promise(resolve => {
+    _confirmResolve = resolve;
+    document.getElementById('confirm-icon').textContent = icon;
+    document.getElementById('confirm-title').textContent = title;
+    document.getElementById('confirm-msg').textContent = msg;
+    const okBtn = document.getElementById('confirm-ok-btn');
+    okBtn.textContent = okText;
+    okBtn.className = 'btn ' + okClass;
+    document.getElementById('confirm-overlay').classList.add('open');
+  });
+}
+function resolveConfirm(val) {
+  document.getElementById('confirm-overlay').classList.remove('open');
+  if (_confirmResolve) { _confirmResolve(val); _confirmResolve = null; }
+}
+
+// ===================== OVERLAYS =====================
+function overlayClick(id, e) { if (e.target === document.getElementById(id)) closeOverlay(id); }
+function closeOverlay(id) { document.getElementById(id).classList.remove('open'); }
+function openOverlay(id) { document.getElementById(id).classList.add('open'); }
+
+document.addEventListener('keydown', e => {
+  const lock = document.getElementById('lock-screen');
+  if (lock && lock.style.display !== 'none') {
+    if (e.key >= '0' && e.key <= '9') pinPress(e.key);
+    else if (e.key === 'Backspace') pinDel();
+    return;
+  }
+  if (e.key === 'Escape') ['student-overlay','halaqa-overlay','bulk-overlay','import-overlay','doura-overlay','doura-student-overlay','renewal-overlay','enroll-overlay','msg-overlay','feetype-overlay','doura-feetype-overlay','center-settings-overlay','excel-import-overlay'].forEach(closeOverlay);
+});
+
+// ===================== PIN =====================
+let pinBuffer = '';
+function initLock() {
+  if (!appPin) return;
+  document.getElementById('lock-screen').style.display = 'flex';
+  document.getElementById('lock-subtitle').textContent = centerName || 'مركز التحفيظ';
+}
+function pinPress(digit) {
+  if (pinBuffer.length >= 4) return;
+  pinBuffer += digit;
+  updatePinDots();
+  if (pinBuffer.length === 4) setTimeout(checkPin, 120);
+}
+function pinDel() {
+  pinBuffer = pinBuffer.slice(0,-1);
+  updatePinDots();
+  document.getElementById('lock-error').textContent = '';
+}
+function updatePinDots(state='') {
+  for (let i=0;i<4;i++) {
+    const dot = document.getElementById('dot-'+i);
+    dot.className = 'pin-dot';
+    if (state==='error') dot.classList.add('error');
+    else if (i < pinBuffer.length) dot.classList.add('filled');
+  }
+}
+function checkPin() {
+  if (pinBuffer === appPin) {
+    document.getElementById('lock-screen').style.display = 'none';
+    pinBuffer = ''; updatePinDots();
+  } else {
+    updatePinDots('error');
+    document.getElementById('lock-error').textContent = '❌ رمز خاطئ، حاولي مرة أخرى';
+    setTimeout(() => { pinBuffer=''; updatePinDots(); document.getElementById('lock-error').textContent=''; }, 1000);
+  }
+}
+function showPinReset() {
+  const ans = prompt('للتحقق، أدخلي اسم المركز:');
+  if (ans && ans.trim() === centerName.trim()) {
+    const newPin = prompt('أدخلي رمز جديد (4 أرقام):');
+    if (newPin && /^\d{4}$/.test(newPin)) {
+      appPin = newPin; localStorage.setItem('hifz_pin', appPin);
+      alert('✅ تم تغيير الرمز بنجاح');
+      document.getElementById('lock-screen').style.display = 'none';
+    } else { alert('رمز غير صحيح — يجب أن يكون 4 أرقام'); }
+  } else { alert('❌ اسم المركز غير صحيح'); }
+}
+
+// ===================== AUTO BACKUP =====================
+let backupTimer = null;
+const BACKUP_INTERVAL = 30 * 60 * 1000;
+const MAX_BACKUPS = 5;
+
+function autoBackup() {
+  try {
+    const data = {halaqat, archivedHalaqat, students, dourat, semester, savedAt: new Date().toISOString(), version:3};
+    const json = JSON.stringify(data);
+    for (let i = MAX_BACKUPS-1; i > 0; i--) {
+      const prev = localStorage.getItem('hifz_backup_'+(i-1));
+      if (prev) localStorage.setItem('hifz_backup_'+i, prev);
+    }
+    localStorage.setItem('hifz_backup_0', json);
+    localStorage.setItem('hifz_backup_time', new Date().toLocaleString('ar-BH'));
+    showBackupToast();
+  } catch(e) {}
+}
+
+function showBackupToast() {
+  const t = document.getElementById('backup-toast');
+  const time = localStorage.getItem('hifz_backup_time') || '';
+  t.textContent = '✅ نسخة احتياطية · ' + time;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function scheduleBackup() {
+  clearTimeout(backupTimer);
+  backupTimer = setTimeout(() => { autoBackup(); scheduleBackup(); }, BACKUP_INTERVAL);
+}
+
+function restoreFromBackup(idx=0) {
+  const raw = localStorage.getItem('hifz_backup_'+idx);
+  if (!raw) { alert('لا توجد نسخة احتياطية محفوظة'); return; }
+  try {
+    const data = JSON.parse(raw);
+    const time = data.savedAt ? new Date(data.savedAt).toLocaleString('ar-BH') : '—';
+    if (!confirm(`استعادة النسخة من:\n${time}\n\nسيتم استبدال البيانات الحالية. متابعة؟`)) return;
+    halaqat = data.halaqat||[]; archivedHalaqat = data.archivedHalaqat||[];
+    students = data.students||[]; dourat = data.dourat||[];
+    semester = data.semester||'الفصل الأول';
+    saveData(); renderStudents(); updateSemesterLabel();
+    toast('✅ تم استعادة البيانات بنجاح!');
+  } catch(e) { alert('❌ تعذر قراءة النسخة الاحتياطية'); }
+}
+
+function openBackupManager() {
+  let msg = '📦 النسخ الاحتياطية:\n\n'; let found = false;
+  for (let i=0;i<MAX_BACKUPS;i++) {
+    const raw = localStorage.getItem('hifz_backup_'+i);
+    if (raw) {
+      try {
+        const d = JSON.parse(raw);
+        const time = d.savedAt ? new Date(d.savedAt).toLocaleString('ar-BH') : '—';
+        msg += `${i===0?'🟢':'⚪'} نسخة ${i+1}: ${time} · ${(d.students||[]).length} طالبة\n`;
+        found = true;
+      } catch(e) {}
+    }
+  }
+  if (!found) { alert('لا توجد نسخ احتياطية بعد'); return; }
+  msg += '\nأي نسخة تريدين استعادتها؟ (1-5)';
+  const ans = prompt(msg);
+  if (!ans) return;
+  const idx = parseInt(ans)-1;
+  if (idx >= 0 && idx < MAX_BACKUPS) restoreFromBackup(idx);
+  else alert('رقم غير صحيح');
+}
+
+// ===================== SETUP & CENTER =====================
+function applyCenter() {
+  document.getElementById('topbar-center-name').textContent = centerName || 'مركز التحفيظ';
+  const logoWrap = document.getElementById('topbar-logo-wrap');
+  if (centerLogo) {
+    logoWrap.innerHTML = '<img src="'+centerLogo+'" style="width:36px;height:36px;border-radius:8px;object-fit:cover;"/>';
+  } else { logoWrap.textContent = '📖'; }
+}
+
+function previewSetupLogo(event) {
+  const file = event.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => { centerLogo = e.target.result; document.getElementById('setup-logo-preview').style.display='block'; document.getElementById('setup-logo-img').src=centerLogo; };
+  reader.readAsDataURL(file);
+}
+
+function saveSetup() {
+  const name = document.getElementById('setup-name').value.trim();
+  const pinEnabled = document.getElementById('setup-pin-toggle').checked;
+  const pin = pinEnabled ? document.getElementById('setup-pin').value.trim() : '';
+  if (!name) { alert('يرجى إدخال اسم المركز'); return; }
+  if (pinEnabled && !/^\d{4}$/.test(pin)) { alert('يرجى إدخال رمز دخول مكون من 4 أرقام'); return; }
+  centerName = name; appPin = pin;
+  saveData(); applyCenter();
+  document.getElementById('setup-screen').style.display = 'none';
+  renderStudents();
+}
+
+function toggleSetupPin(cb) {
+  document.getElementById('setup-pin-wrap').style.display = cb.checked ? 'block' : 'none';
+  if (!cb.checked) document.getElementById('setup-pin').value = '';
+}
+
+function toggleCsPin(cb) {
+  document.getElementById('cs-pin-wrap').style.display = cb.checked ? 'block' : 'none';
+  if (!cb.checked) document.getElementById('cs-pin').value = '';
+}
+
+function openCenterSettings() {
+  document.getElementById('cs-name').value = centerName;
+  const prev = document.getElementById('cs-logo-preview');
+  prev.innerHTML = centerLogo ? '<img src="'+centerLogo+'" class="logo-preview"/>' : '';
+  const toggle = document.getElementById('cs-pin-toggle');
+  toggle.checked = !!appPin;
+  document.getElementById('cs-pin-wrap').style.display = appPin ? 'block' : 'none';
+  document.getElementById('cs-pin').value = '';
+  openOverlay('center-settings-overlay');
+}
+
+function previewCsLogo(event) {
+  const file = event.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => { centerLogo = e.target.result; document.getElementById('cs-logo-preview').innerHTML = '<img src="'+centerLogo+'" class="logo-preview"/>'; };
+  reader.readAsDataURL(file);
+}
+
+function saveCenterSettings() {
+  const name = document.getElementById('cs-name').value.trim();
+  const pinEnabled = document.getElementById('cs-pin-toggle').checked;
+  const newPin = pinEnabled ? document.getElementById('cs-pin').value.trim() : '';
+  if (!name) { alert('يرجى إدخال اسم المركز'); return; }
+  if (pinEnabled && newPin && !/^\d{4}$/.test(newPin)) { alert('رمز الدخول يجب أن يكون 4 أرقام'); return; }
+  centerName = name;
+  if (!pinEnabled) { appPin = ''; } else if (newPin) { appPin = newPin; toast('✅ تم تغيير رمز الدخول'); }
+  saveData(); applyCenter(); closeOverlay('center-settings-overlay');
+}
+
+// ===================== SEMESTER =====================
+function updateSemesterLabel() {
+  const el = document.getElementById('semester-label');
+  if (el) el.textContent = semester;
+}
+
+function openRenewalModal() {
+  document.getElementById('renewal-current').textContent = semester;
+  const idx = SEMESTERS.indexOf(semester);
+  document.getElementById('renewal-select').value = SEMESTERS[(idx+1) % SEMESTERS.length];
+  const active = students.filter(s=>!s.paused);
+  const paused = students.filter(s=>s.paused);
+  document.getElementById('renewal-summary').innerHTML =
+    `👩‍🎓 طالبات نشطات سيتم تصفير دفعهن: <strong>${active.length}</strong><br/>⏸ طالبات متوقفات لن تتأثر: <strong>${paused.length}</strong>`;
+  openOverlay('renewal-overlay');
+}
+
+function confirmRenewal() {
+  const selected = document.getElementById('renewal-select').value;
+  if (selected === semester) { alert('يرجى اختيار فصل مختلف عن الحالي'); return; }
+  semester = selected;
+  students.forEach(s => {
+    if (!s.paused) (s.halaqat||[]).forEach(sh => { sh.paid = false; sh.paidAt = null; });
+  });
+  saveData(); updateSemesterLabel(); closeOverlay('renewal-overlay'); renderStudents();
+  toast(`✅ تم التجديد للـ ${semester}`);
+}
+
+// ===================== DROPDOWN =====================
+function toggleDropdown() { document.getElementById('main-dropdown-menu').classList.toggle('open'); }
+function closeDropdown() { document.getElementById('main-dropdown-menu').classList.remove('open'); }
+document.addEventListener('click', e => {
+  const dd = document.getElementById('main-dropdown');
+  if (dd && !dd.contains(e.target)) closeDropdown();
+});
+
+// ===================== TABS =====================
 function showPage(name, el) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
   el.classList.add('active');
-  if (name === 'halaqat') renderHalaqat();
-  if (name === 'students') renderStudents();
-  if (name === 'archive') renderArchive();
-  if (name === 'dourat') renderDourat();
+  if (name==='halaqat') renderHalaqat();
+  if (name==='students') renderStudents();
+  if (name==='archive') renderArchive();
+  if (name==='dourat') renderDourat();
+  if (name==='reports') renderReports();
+}
+
+// ===================== STATS =====================
+function renderStats() {
+  const active = students.filter(s=>!s.paused);
+  const total = students.length;
+  let totalExpected=0, totalPaid=0, unpaidCount=0;
+  active.forEach(s => {
+    let hasUnpaid = false;
+    (s.halaqat||[]).forEach(sh => {
+      const h = halaqat.find(h=>h.id===sh.hid); if (!h) return;
+      const eff = sh.feeType==='exempt'?0:(sh.feeType==='reduced'||sh.feeType==='sponsored')?(sh.customAmount||0):h.amount;
+      totalExpected += eff;
+      if (sh.paid||sh.feeType==='exempt'||sh.feeType==='sponsored') totalPaid += eff;
+      else hasUnpaid = true;
+    });
+    if (hasUnpaid) unpaidCount++;
+  });
+  const paused = students.filter(s=>s.paused).length;
+  const collPct = totalExpected>0 ? Math.round(totalPaid/totalExpected*100) : 0;
+  const collColor = collPct>=80?'var(--green)':collPct>=50?'var(--amber)':'var(--red)';
+  document.getElementById('stats').innerHTML = `
+    <div class="stat-card"><div class="stat-label">إجمالي الطالبات</div><div class="stat-value">${total}${paused?`<span style="font-size:13px;color:var(--text-muted);"> (⏸${paused})</span>`:''}</div></div>
+    <div class="stat-card"><div class="stat-label">المبلغ المحصّل</div><div class="stat-value green">${totalPaid} د.ب</div><div class="stat-progress"><div class="stat-progress-fill" style="width:${collPct}%;background:${collColor};"></div></div></div>
+    <div class="stat-card"><div class="stat-label">المبلغ المتبقي</div><div class="stat-value red">${totalExpected-totalPaid} د.ب</div></div>
+    <div class="stat-card"><div class="stat-label">طالبات متأخرة</div><div class="stat-value amber">${unpaidCount}</div>${unpaidCount>0?`<div style="font-size:10px;color:var(--amber);margin-top:3px;">${Math.round(unpaidCount/Math.max(active.length,1)*100)}% من النشطات</div>`:'<div style="font-size:10px;color:var(--green-dark);margin-top:3px;">✓ لا تأخيرات</div>'}</div>
+    <div class="stat-card"><div class="stat-label">نسبة التحصيل</div><div class="stat-value" style="color:${collColor};">${collPct}%</div><div class="stat-progress"><div class="stat-progress-fill" style="width:${collPct}%;background:${collColor};"></div></div></div>
+  `;
+}
+
+function updateHalaqaFilter() {
+  const sel = document.getElementById('filter-halaqa');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="all">كل الحلقات</option>' +
+    halaqat.map(h=>`<option value="${h.id}"${cur===h.id?' selected':''}>${esc(h.name)}</option>`).join('');
+}
+
+// ===================== STUDENTS =====================
+function renderStudents() {
+  renderStats(); updateHalaqaFilter();
+  const q = document.getElementById('search').value.trim().toLowerCase();
+  const fh = document.getElementById('filter-halaqa').value;
+  const fp = document.getElementById('filter-paid').value;
+
+  const list = students.map((s,i)=>({...s,_i:i})).filter(s => {
+    const mq = !q || s.name.toLowerCase().includes(q) || (s.phone||'').includes(q) || (s.userid||'').includes(q);
+    const mh = fh==='all' || (s.halaqat||[]).some(sh=>sh.hid===fh);
+    const hasUnpaid = (s.halaqat||[]).some(sh=>!sh.paid);
+    const mp = fp==='all' || (fp==='unpaid'?hasUnpaid:!hasUnpaid);
+    return mq && mh && mp;
+  }).sort((a,b)=>a.name.localeCompare(b.name,'ar'));
+
+  const container = document.getElementById('students-list');
+  if (!list.length) {
+    const qv = document.getElementById('search').value.trim();
+    container.innerHTML = qv
+      ? `<div class="empty-state"><div class="empty-state-icon">🔍</div><div class="empty-state-title">لا توجد نتائج</div><div class="empty-state-sub">لم يتم العثور على نتائج لـ "<strong>${esc(qv)}</strong>"</div></div>`
+      : `<div class="empty-state"><div class="empty-state-icon">👩‍🎓</div><div class="empty-state-title">لا توجد طالبات بعد</div><div class="empty-state-sub">أضيفي أول حلقة من تبويب الحلقات<br/>ثم أضيفي الطالبات</div></div>`;
+    return;
+  }
+
+  container.innerHTML = list.map(s => {
+    const sHalaqat = (s.halaqat||[]).map(sh=>{
+      const h = halaqat.find(h=>h.id===sh.hid);
+      return h ? {...sh,name:h.name,baseAmount:h.amount} : null;
+    }).filter(Boolean);
+
+    const effectiveAmount = sh => sh.feeType==='exempt'?0:(sh.feeType==='reduced'||sh.feeType==='sponsored')?(sh.customAmount||0):sh.baseAmount;
+    const hasUnpaid = sHalaqat.some(sh=>sh.feeType!=='exempt'&&sh.feeType!=='sponsored'&&!sh.paid);
+    const totalOwed = sHalaqat.reduce((a,sh)=>a+effectiveAmount(sh),0);
+    const totalPaidAmt = sHalaqat.filter(sh=>sh.paid).reduce((a,sh)=>a+effectiveAmount(sh),0);
+    const halaqaBadges = sHalaqat.map(sh=>`<span class="badge halaqa">${esc(sh.name)}</span>`).join('');
+
+    const statusBadge = s.paused
+      ? `<span class="badge" style="background:#f0eeea;color:var(--text-muted);">⏸ متوقفة</span>`
+      : !sHalaqat.length
+        ? `<span class="badge amber">بدون حلقة</span>`
+        : hasUnpaid
+          ? `<span class="badge unpaid">متأخرة ${totalOwed-totalPaidAmt} د.ب</span>`
+          : `<span class="badge paid">✓ مكتملة</span>`;
+
+    const halaqaRows = sHalaqat.map(sh => {
+      const eff = effectiveAmount(sh);
+      const feeLabel = sh.feeType==='exempt'?'<span class="badge" style="background:#f0eeea;color:var(--text-muted);">معفية</span>'
+        :sh.feeType==='reduced'?`<span class="badge amber">مخفضة ${eff} د.ب</span>`
+        :sh.feeType==='sponsored'?`<span class="badge" style="background:var(--blue-light);color:var(--blue);">بكفالة ${eff} د.ب</span>`:'';
+      const isExemptOrSponsored = sh.feeType==='exempt'||sh.feeType==='sponsored';
+      return `<div class="halaqa-row" style="${s.paused?'opacity:0.5;pointer-events:none;':''}">
+        <div>
+          <div class="halaqa-name-txt">${esc(sh.name)} ${feeLabel}</div>
+          <div class="halaqa-amount-txt">${eff} د.ب ${sh.feeType&&sh.feeType!=='normal'?'(الأصلي: '+sh.baseAmount+' د.ب)':''}</div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+          ${isExemptOrSponsored
+            ? `<span class="badge paid">✓ لا يلزم تذكير</span>`
+            : sh.paid
+              ? `<div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;">
+                   <span class="badge paid">✓ دفعت</span>
+                   ${sh.paidAt ? `<span class="paid-date">📅 ${fmtDate(sh.paidAt)}</span>` : ''}
+                 </div>
+                 <button class="btn sm danger" onclick="event.stopPropagation();toggleHalaqaPaid(${s._i},'${sh.hid}')">إلغاء</button>`
+              : `<span class="badge unpaid">✗ لم تدفع</span>
+                 <button class="btn sm confirm" onclick="event.stopPropagation();toggleHalaqaPaid(${s._i},'${sh.hid}')">✓ تأكيد دفع</button>
+                 <a href="https://wa.me/${formatPhone(s.phone)}?text=${encodeURIComponent(waTemplate+'\n('+sh.name+')')}" target="_blank" class="btn wa sm" style="text-decoration:none;" onclick="event.stopPropagation()">📲</a>`
+          }
+          <button class="btn sm" style="color:var(--text-muted);font-size:11px;" onclick="event.stopPropagation();openFeeTypeModal(${s._i},'${sh.hid}')">⚙</button>
+        </div>
+      </div>`;
+    }).join('');
+
+    const noteHtml = s.note ? `<div class="student-note">📝 ${esc(s.note)}</div>` : '';
+    const pauseBtn = s.paused
+      ? `<button class="btn sm confirm" onclick="event.stopPropagation();togglePaused(${s._i})">▶ تفعيل</button>`
+      : `<button class="btn sm" style="color:var(--text-muted);" onclick="event.stopPropagation();togglePaused(${s._i})">⏸ إيقاف مؤقت</button>`;
+
+    return `<div class="student-card" style="${s.paused?'opacity:0.75;':''}">
+      <div class="student-header" onclick="toggleCard('sc-${s._i}')">
+        <div style="flex:1;min-width:0;pointer-events:none;">
+          <div class="student-name">${esc(s.name)}</div>
+          <div class="student-phone" dir="ltr" style="text-align:right;">${s.userid?'#'+esc(s.userid)+'  ·  ':''}${esc(s.phone||'')}</div>
+          ${noteHtml}
+          <div style="margin-top:5px;">${halaqaBadges}</div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;pointer-events:none;">
+          ${statusBadge}<span style="color:var(--text-muted);font-size:18px;">⌄</span>
+        </div>
+      </div>
+      <div class="student-body" id="sc-${s._i}">
+        ${halaqaRows||'<div style="font-size:13px;color:var(--text-muted);">لا توجد حلقات مسجلة</div>'}
+        <div class="student-actions">
+          <button class="btn sm" onclick="event.stopPropagation();openStudentModal(${s._i})">✏ تعديل</button>
+          <button class="btn sm" style="color:var(--blue);" onclick="event.stopPropagation();openEnrollModal(${s._i})">🌟 تسجيل في دورة</button>
+          ${pauseBtn}
+          <button class="btn sm danger" onclick="event.stopPropagation();deleteStudent(${s._i})">🗑 حذف</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleCard(id) { const el=document.getElementById(id); if(el) el.classList.toggle('open'); }
+function togglePaused(idx) { students[idx].paused=!students[idx].paused; saveData(); renderStudents(); }
+
+function toggleHalaqaPaid(studentIdx, hid) {
+  const sh = (students[studentIdx].halaqat||[]).find(sh=>sh.hid===hid);
+  if (sh) {
+    sh.paid = !sh.paid;
+    sh.paidAt = sh.paid ? new Date().toISOString() : null;
+    saveData(); renderStudents();
+  }
+}
+
+async function deleteStudent(idx) {
+  const s = students[idx];
+  const ok = await showConfirm('حذف الطالبة', `هل أنت متأكدة من حذف "${s.name}"؟\nلا يمكن التراجع عن هذا الإجراء.`, '🗑 حذف', 'danger', '🗑');
+  if (!ok) return;
+  students.splice(idx,1); saveData(); renderStudents();
+  toast(`تم حذف ${s.name}`, 'info');
+}
+
+// ===================== STUDENT MODAL =====================
+function openStudentModal(id=null) {
+  editStudentId = id;
+  document.getElementById('student-modal-title').textContent = id!==null ? 'تعديل بيانات الطالبة' : 'إضافة طالبة جديدة';
+  const s = id!==null ? students[id] : null;
+  document.getElementById('f-name').value = s?s.name:'';
+  document.getElementById('f-userid').value = s?(s.userid||''):'';
+  document.getElementById('f-phone').value = s?(s.phone||''):'';
+  document.getElementById('f-note').value = s?(s.note||''):'';
+  const cl = document.getElementById('halaqa-checklist');
+  if (!halaqat.length) {
+    cl.innerHTML = '<div style="color:var(--text-muted);font-size:13px;padding:8px;">أضيفي حلقات أولاً من تبويب "الحلقات"</div>';
+  } else {
+    const enrolled = s ? (s.halaqat||[]).map(sh=>sh.hid) : [];
+    cl.innerHTML = halaqat.map(h=>`
+      <label class="halaqa-check-item">
+        <input type="checkbox" value="${h.id}" ${enrolled.includes(h.id)?'checked':''}/>
+        <span class="halaqa-check-label">${esc(h.name)}</span>
+        <span class="halaqa-check-price">${h.amount} د.ب</span>
+      </label>`).join('');
+  }
+  openOverlay('student-overlay');
+  document.getElementById('f-name').focus();
+}
+
+function saveStudent() {
+  const name = document.getElementById('f-name').value.trim();
+  const userid = document.getElementById('f-userid').value.trim();
+  const phone = document.getElementById('f-phone').value.trim();
+  const note = document.getElementById('f-note').value.trim();
+  if (!name) { alert('يرجى إدخال اسم الطالبة'); return; }
+  if (userid && !/^\d{8}$/.test(userid)) { alert('رقم المستخدم يجب أن يكون 8 أرقام'); return; }
+  if (phone && !/^\d{8}$/.test(phone)) { alert('رقم الهاتف يجب أن يكون 8 أرقام'); return; }
+  if (userid) {
+    const dupIdx = students.findIndex((s,i)=>s.userid===userid&&i!==editStudentId);
+    if (dupIdx!==-1) { alert(`رقم المستخدم مستخدم بالفعل للطالبة: ${students[dupIdx].name}`); return; }
+  }
+  const checked = [...document.querySelectorAll('#halaqa-checklist input[type=checkbox]:checked')].map(c=>c.value);
+  if (editStudentId!==null) {
+    const existing = students[editStudentId].halaqat||[];
+    students[editStudentId] = {...students[editStudentId], name, userid, phone, note,
+      halaqat: checked.map(hid => existing.find(sh=>sh.hid===hid) || {hid,paid:false,paidAt:null})
+    };
+  } else {
+    students.push({id:uid(), name, userid, phone, note, halaqat: checked.map(hid=>({hid,paid:false,paidAt:null}))});
+  }
+  saveData(); closeOverlay('student-overlay'); renderStudents();
+  toast(editStudentId!==null?'✅ تم تحديث البيانات':'✅ تمت إضافة الطالبة');
+}
+
+// ===================== HALAQAT =====================
+function renderHalaqat() {
+  const tbody = document.getElementById('halaqat-tbody');
+  if (!halaqat.length) {
+    tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="empty-state-icon">📚</div><div class="empty-state-title">لا توجد حلقات بعد</div><div class="empty-state-sub">اضغطي "+ إضافة حلقة" للبدء</div></div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = halaqat.map((h,i) => {
+    const count = students.filter(s=>(s.halaqat||[]).some(sh=>sh.hid===h.id)).length;
+    return `<tr>
+      <td style="color:var(--text-muted);font-size:12px;">${i+1}</td>
+      <td style="font-weight:600;">${esc(h.name)}</td>
+      <td style="color:var(--text-muted);">${esc(h.teacher||'—')}</td>
+      <td style="color:var(--text-muted);">${esc(h.supervisor||'—')}</td>
+      <td>${h.amount} د.ب</td>
+      <td>${count} طالبة</td>
+      <td><div style="display:flex;gap:6px;">
+        <button class="btn sm" onclick="openHalaqaModal(${i})">✏ تعديل</button>
+        <button class="btn sm" style="color:var(--amber);" onclick="archiveHalaqa(${i})">📦 أرشفة</button>
+        <button class="btn sm danger" onclick="deleteHalaqa(${i})">🗑 حذف</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+function openHalaqaModal(id=null) {
+  editHalaqaId = id;
+  document.getElementById('halaqa-modal-title').textContent = id!==null?'تعديل الحلقة':'إضافة حلقة جديدة';
+  const h = id!==null ? halaqat[id] : null;
+  document.getElementById('h-name').value = h?h.name:'';
+  document.getElementById('h-teacher').value = h?(h.teacher||''):'';
+  document.getElementById('h-supervisor').value = h?(h.supervisor||''):'';
+  document.getElementById('h-amount').value = h?h.amount:'';
+  openOverlay('halaqa-overlay');
+  document.getElementById('h-name').focus();
+}
+
+function saveHalaqa() {
+  const name = document.getElementById('h-name').value.trim();
+  const teacher = document.getElementById('h-teacher').value.trim();
+  const supervisor = document.getElementById('h-supervisor').value.trim();
+  const amount = parseFloat(document.getElementById('h-amount').value)||0;
+  if (!name) { alert('يرجى إدخال اسم الحلقة'); return; }
+  if (editHalaqaId!==null) {
+    halaqat[editHalaqaId] = {...halaqat[editHalaqaId], name, teacher, supervisor, amount};
+  } else {
+    halaqat.push({id:uid(), name, teacher, supervisor, amount});
+  }
+  saveData(); closeOverlay('halaqa-overlay'); renderHalaqat();
+  toast(editHalaqaId!==null?'✅ تم تحديث الحلقة':'✅ تمت إضافة الحلقة');
+}
+
+function deleteHalaqa(idx) {
+  const h = halaqat[idx];
+  const used = students.filter(s=>(s.halaqat||[]).some(sh=>sh.hid===h.id)).length;
+  const msg = used>0
+    ? `⚠️ هذه الحلقة فيها ${used} طالبة مسجلة.\nالحذف سيزيل الحلقة من سجلات جميع الطالبات.\n\nهل أنت متأكدة؟`
+    : 'هل أنت متأكدة من حذف هذه الحلقة؟';
+  if (!confirm(msg)) return;
+  students.forEach(s=>{ if(s.halaqat) s.halaqat=s.halaqat.filter(sh=>sh.hid!==h.id); });
+  halaqat.splice(idx,1); saveData(); renderHalaqat(); renderStudents();
+}
+
+function archiveHalaqa(idx) {
+  const h = halaqat[idx];
+  if (!confirm(`هل تريدين أرشفة حلقة "${h.name}"؟`)) return;
+  archivedHalaqat.push({...h, archivedAt: new Date().toISOString()});
+  halaqat.splice(idx,1); saveData(); renderHalaqat();
+  toast('تم أرشفة الحلقة', 'info');
 }
 
 // ===================== DOURAT =====================
@@ -780,24 +1338,18 @@ function renderDauratStats() {
   const active = dourat.filter(d=>!d.archived);
   const totalStudents = active.reduce((a,d)=>a+(d.students||[]).length,0);
   const totalPaid = active.reduce((a,d)=>{
-    const sections = d.sections||[{id:'default',name:'عام',amount:d.amount||0}];
-    return a+(d.students||[]).filter(s=>s.paid).reduce((b,s)=>{
+    const sections=d.sections||[{id:'default',name:'عام',amount:d.amount||0}];
+    return a+(d.students||[]).filter(s=>s.paid||s.feeType==='exempt'||s.feeType==='sponsored').reduce((b,s)=>{
       const sec=sections.find(sec=>sec.id===s.sectionId)||sections[0];
-      return b+(sec?sec.amount:0);
+      const eff=s.feeType==='exempt'?0:(s.feeType==='reduced'||s.feeType==='sponsored')?(s.customAmount||0):(sec?sec.amount:0);
+      return b+eff;
     },0);
   },0);
-  const totalExpected = active.reduce((a,d)=>{
-    const sections = d.sections||[{id:'default',name:'عام',amount:d.amount||0}];
-    return a+(d.students||[]).reduce((b,s)=>{
-      const sec=sections.find(sec=>sec.id===s.sectionId)||sections[0];
-      return b+(sec?sec.amount:0);
-    },0);
-  },0);
-  const unpaid = active.reduce((a,d)=>a+(d.students||[]).filter(s=>!s.paid).length,0);
+  const unpaid = active.reduce((a,d)=>a+(d.students||[]).filter(s=>!s.paid&&s.feeType!=='exempt'&&s.feeType!=='sponsored').length,0);
   document.getElementById('dourat-stats').innerHTML = `
     <div class="stat-card"><div class="stat-label">الدورات النشطة</div><div class="stat-value">${active.length}</div></div>
     <div class="stat-card"><div class="stat-label">إجمالي المسجلات</div><div class="stat-value">${totalStudents}</div></div>
-    <div class="stat-card"><div class="stat-label">المبلغ المحصّل</div><div class="stat-value green">${totalPaid} د</div></div>
+    <div class="stat-card"><div class="stat-label">المبلغ المحصّل</div><div class="stat-value green">${totalPaid} د.ب</div></div>
     <div class="stat-card"><div class="stat-label">لم يدفعن</div><div class="stat-value red">${unpaid}</div></div>
   `;
 }
@@ -814,10 +1366,10 @@ function renderDourat(keepOpenIdx=null) {
     const didx = dourat.indexOf(d);
     const sections = d.sections||[{id:'default',name:'عام',amount:d.amount||0}];
     const studs = (d.students||[]).slice().sort((a,b)=>a.name.localeCompare(b.name,'ar'));
-    const effAmt = (s) => {
-      const sec = sections.find(sec=>sec.id===s.sectionId)||sections[0];
-      const base = sec?sec.amount:0;
-      return s.feeType==='exempt' ? 0 : (s.feeType==='reduced'||s.feeType==='sponsored') ? (s.customAmount||0) : base;
+    const effAmt = s => {
+      const sec=sections.find(sec=>sec.id===s.sectionId)||sections[0];
+      const base=sec?sec.amount:0;
+      return s.feeType==='exempt'?0:(s.feeType==='reduced'||s.feeType==='sponsored')?(s.customAmount||0):base;
     };
     const totalExpected = studs.reduce((a,s)=>a+effAmt(s),0);
     const totalPaid = studs.filter(s=>s.paid||s.feeType==='exempt'||s.feeType==='sponsored').reduce((a,s)=>a+effAmt(s),0);
@@ -828,29 +1380,32 @@ function renderDourat(keepOpenIdx=null) {
       const realIdx = (d.students||[]).findIndex(st=>st.id===s.id);
       const sec = sections.find(sec=>sec.id===s.sectionId)||sections[0];
       const baseAmt = sec?sec.amount:0;
-      const eff = s.feeType==='exempt' ? 0 : (s.feeType==='reduced'||s.feeType==='sponsored') ? (s.customAmount||0) : baseAmt;
-      const feeLabel = s.feeType==='exempt' ? '<span class="badge" style="background:#f0eeea;color:var(--text-muted);">معفية</span>'
-        : s.feeType==='reduced' ? `<span class="badge amber">مخفضة ${eff} د</span>`
-        : s.feeType==='sponsored' ? `<span class="badge" style="background:var(--blue-light);color:var(--blue);">بكفالة ${eff} د</span>`
-        : '';
-      const isExemptOrSponsored = s.feeType==='exempt' || s.feeType==='sponsored';
+      const eff = s.feeType==='exempt'?0:(s.feeType==='reduced'||s.feeType==='sponsored')?(s.customAmount||0):baseAmt;
+      const feeLabel = s.feeType==='exempt'?'<span class="badge" style="background:#f0eeea;color:var(--text-muted);">معفية</span>'
+        :s.feeType==='reduced'?`<span class="badge amber">مخفضة ${eff} د.ب</span>`
+        :s.feeType==='sponsored'?`<span class="badge" style="background:var(--blue-light);color:var(--blue);">بكفالة ${eff} د.ب</span>`:'';
+      const isExemptOrSponsored = s.feeType==='exempt'||s.feeType==='sponsored';
       return `<div class="halaqa-row">
         <div>
           <div class="halaqa-name-txt">${esc(s.name)} ${feeLabel}</div>
-          <div class="halaqa-amount-txt">${esc(sec?sec.name:'')} · ${eff} دينار${s.note?' · '+esc(s.note):''}</div>
+          <div class="halaqa-amount-txt">${esc(sec?sec.name:'')} · ${eff} د.ب${s.note?' · '+esc(s.note):''}</div>
           <div class="halaqa-amount-txt" dir="ltr">${esc(s.phone||'')}</div>
         </div>
         <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
           ${isExemptOrSponsored
             ? `<span class="badge paid">✓ لا يلزم تذكير</span>`
             : s.paid
-              ? `<span class="badge paid">✓ دفعت</span><button class="btn sm danger" onclick="toggleDouraStudentPaid(${didx},${realIdx})">إلغاء</button>`
+              ? `<div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;">
+                   <span class="badge paid">✓ دفعت</span>
+                   ${s.paidAt ? `<span class="paid-date">📅 ${fmtDate(s.paidAt)}</span>` : ''}
+                 </div>
+                 <button class="btn sm danger" onclick="event.stopPropagation();toggleDouraStudentPaid(${didx},${realIdx})">إلغاء</button>`
               : `<span class="badge unpaid">✗ لم تدفع</span>
-                 <button class="btn sm confirm" onclick="toggleDouraStudentPaid(${didx},${realIdx})">✓ تأكيد دفع</button>
-                 <a href="https://wa.me/${formatPhone(s.phone)}?text=${waMsg(s.name,d.name)}" target="_blank" class="btn wa sm" style="text-decoration:none;">📲</a>`}
-          <button class="btn sm" style="color:var(--text-muted);font-size:11px;" onclick="openDouraFeeTypeModal(${didx},${realIdx})">⚙</button>
-          <button class="btn sm" onclick="openDouraStudentModal(${didx},${realIdx})">✏</button>
-          <button class="btn sm danger" onclick="deleteDouraStudent(${didx},${realIdx})">🗑</button>
+                 <button class="btn sm confirm" onclick="event.stopPropagation();toggleDouraStudentPaid(${didx},${realIdx})">✓ تأكيد دفع</button>
+                 <a href="https://wa.me/${formatPhone(s.phone)}?text=${encodeURIComponent(waTemplate+'\n('+d.name+')')}" target="_blank" class="btn wa sm" style="text-decoration:none;" onclick="event.stopPropagation()">📲</a>`}
+          <button class="btn sm" style="color:var(--text-muted);font-size:11px;" onclick="event.stopPropagation();openDouraFeeTypeModal(${didx},${realIdx})">⚙</button>
+          <button class="btn sm" onclick="event.stopPropagation();openDouraStudentModal(${didx},${realIdx})">✏</button>
+          <button class="btn sm danger" onclick="event.stopPropagation();deleteDouraStudent(${didx},${realIdx})">🗑</button>
         </div>
       </div>`;
     }).join('');
@@ -859,13 +1414,13 @@ function renderDourat(keepOpenIdx=null) {
 
     return `<div class="student-card" style="border-right:4px solid var(--amber);">
       <div class="student-header" onclick="toggleCard('dc-${didx}')">
-        <div style="flex:1;">
+        <div style="flex:1;pointer-events:none;">
           <div class="student-name">🌟 ${esc(d.name)}</div>
           <div class="student-phone">${d.date?d.date+' · ':''} ${studs.length} مسجلة · دفعت: ${paidCount} · لم تدفع: ${unpaidCount}</div>
           <div style="margin-top:5px;">${sectionSummary}</div>
         </div>
-        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
-          <span class="badge" style="background:var(--amber-light);color:var(--amber);">${totalPaid}/${totalExpected} د</span>
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;pointer-events:none;">
+          <span class="badge" style="background:var(--amber-light);color:var(--amber);">${totalPaid}/${totalExpected} د.ب</span>
           <span style="color:var(--text-muted);font-size:18px;">⌄</span>
         </div>
       </div>
@@ -882,30 +1437,41 @@ function renderDourat(keepOpenIdx=null) {
       </div>
     </div>`;
   }).join('');
-  // Keep card open if specified
   if (keepOpenIdx !== null) {
     const el = document.getElementById(`dc-${keepOpenIdx}`);
     if (el) el.classList.add('open');
   }
 }
 
-function addSectionRow(name='',amount='') {
+function toggleDouraStudentPaid(douraIdx, stuIdx) {
+  const s = dourat[douraIdx].students[stuIdx];
+  s.paid = !s.paid;
+  s.paidAt = s.paid ? new Date().toISOString() : null;
+  saveData(); renderDourat(douraIdx);
+}
+
+function deleteDouraStudent(douraIdx, stuIdx) {
+  if (!confirm('حذف هذه المسجلة؟')) return;
+  dourat[douraIdx].students.splice(stuIdx,1); saveData(); renderDourat(douraIdx);
+}
+
+function addSectionRow(name='', amount='') {
   const list = document.getElementById('d-sections-list');
   const row = document.createElement('div');
-  row.style.cssText='display:flex;gap:6px;align-items:center;';
-  row.innerHTML=`<input type="text" placeholder="اسم القسم" value="${esc(name)}" style="flex:1;" class="sec-name"/><input type="number" placeholder="المبلغ" value="${amount}" style="width:90px;" min="0" class="sec-amount"/><button type="button" class="btn sm danger" onclick="this.parentElement.remove()">✕</button>`;
+  row.style.cssText = 'display:flex;gap:6px;align-items:center;';
+  row.innerHTML = `<input type="text" placeholder="اسم القسم" value="${esc(name)}" style="flex:1;" class="sec-name"/><input type="number" placeholder="المبلغ" value="${amount}" style="width:90px;" min="0" class="sec-amount"/><button type="button" class="btn sm danger" onclick="this.parentElement.remove()">✕</button>`;
   list.appendChild(row);
 }
 
 function openDauratModal(idx=null) {
   editDouraId = idx;
-  document.getElementById('doura-modal-title').textContent = idx!==null ? 'تعديل الدورة' : 'إضافة دورة / نشاط جديد';
+  document.getElementById('doura-modal-title').textContent = idx!==null?'تعديل الدورة':'إضافة دورة / نشاط جديد';
   const d = idx!==null ? dourat[idx] : null;
-  document.getElementById('d-name').value = d ? d.name : '';
-  document.getElementById('d-date').value = d ? (d.date||'') : '';
-  document.getElementById('d-note').value = d ? (d.note||'') : '';
+  document.getElementById('d-name').value = d?d.name:'';
+  document.getElementById('d-date').value = d?(d.date||''):'';
+  document.getElementById('d-note').value = d?(d.note||''):'';
   const list = document.getElementById('d-sections-list');
-  list.innerHTML='';
+  list.innerHTML = '';
   const sections = d ? (d.sections||[{name:'عام',amount:d.amount||0}]) : [];
   if (sections.length) sections.forEach(s=>addSectionRow(s.name,s.amount));
   else addSectionRow();
@@ -926,37 +1492,40 @@ function saveDoura() {
   }));
   if (!sections.length) { alert('يرجى إضافة قسم واحد على الأقل'); return; }
   if (editDouraId!==null) {
-    dourat[editDouraId]={...dourat[editDouraId],name,date,note,sections};
+    dourat[editDouraId] = {...dourat[editDouraId], name, date, note, sections};
   } else {
-    dourat.push({id:uid(),name,date,note,sections,archived:false,students:[]});
+    dourat.push({id:uid(), name, date, note, sections, archived:false, students:[]});
   }
   saveData(); closeOverlay('doura-overlay'); renderDourat();
+  toast(editDouraId!==null?'✅ تم تحديث الدورة':'✅ تمت إضافة الدورة');
 }
 
-function deleteDoura(idx) {
-  if (!confirm('هل أنت متأكدة من حذف هذه الدورة وكل بياناتها؟')) return;
+async function deleteDoura(idx) {
+  const d = dourat[idx];
+  const ok = await showConfirm('حذف الدورة', `حذف "${d.name}" وكل بياناتها؟`, '🗑 حذف', 'danger', '🗑');
+  if (!ok) return;
   dourat.splice(idx,1); saveData(); renderDourat();
+  toast('تم حذف الدورة', 'info');
 }
 
 function archiveDoura(idx) {
-  if (!confirm('أرشفة هذه الدورة؟ ستختفي من القائمة الرئيسية لكن بياناتها محفوظة.')) return;
-  dourat[idx].archived=true; saveData(); renderDourat();
+  dourat[idx].archived = true; saveData(); renderDourat();
+  toast('تم أرشفة الدورة', 'info');
 }
 
 function openDouraStudentModal(douraIdx, realStuIdx=null) {
-  activeDouraId = douraIdx;
-  editDouraStudentId = realStuIdx;
-  document.getElementById('doura-student-title').textContent = realStuIdx!==null ? 'تعديل بيانات المسجلة' : 'إضافة مسجلة جديدة';
+  activeDouraId = douraIdx; editDouraStudentId = realStuIdx;
+  document.getElementById('doura-student-title').textContent = realStuIdx!==null?'تعديل بيانات المسجلة':'إضافة مسجلة جديدة';
   const s = realStuIdx!==null ? dourat[douraIdx].students[realStuIdx] : null;
-  document.getElementById('ds-name').value = s ? s.name : '';
-  document.getElementById('ds-phone').value = s ? (s.phone||'') : '';
-  document.getElementById('ds-personalid').value = s ? (s.personalid||'') : '';
-  document.getElementById('ds-center').value = s ? (s.center||'') : '';
-  document.getElementById('ds-note').value = s ? (s.note||'') : '';
+  document.getElementById('ds-name').value = s?s.name:'';
+  document.getElementById('ds-phone').value = s?(s.phone||''):'';
+  document.getElementById('ds-personalid').value = s?(s.personalid||''):'';
+  document.getElementById('ds-center').value = s?(s.center||''):'';
+  document.getElementById('ds-note').value = s?(s.note||''):'';
   const d = dourat[douraIdx];
   const sections = d.sections||[{id:'default',name:'عام',amount:d.amount||0}];
   const sel = document.getElementById('ds-section');
-  sel.innerHTML = sections.map(sec=>`<option value="${sec.id}" ${s&&s.sectionId===sec.id?'selected':''}>${esc(sec.name)} — ${sec.amount} دينار</option>`).join('');
+  sel.innerHTML = sections.map(sec=>`<option value="${sec.id}" ${s&&s.sectionId===sec.id?'selected':''}>${esc(sec.name)} — ${sec.amount} د.ب</option>`).join('');
   openOverlay('doura-student-overlay');
   document.getElementById('ds-name').focus();
 }
@@ -970,70 +1539,52 @@ function saveDouraStudent() {
   const sectionId = document.getElementById('ds-section').value;
   if (!name) { alert('يرجى إدخال الاسم'); return; }
   const d = dourat[activeDouraId];
-  if (!d.students) d.students=[];
+  if (!d.students) d.students = [];
   if (editDouraStudentId!==null) {
-    d.students[editDouraStudentId]={...d.students[editDouraStudentId],name,phone,personalid,center,note,sectionId};
+    d.students[editDouraStudentId] = {...d.students[editDouraStudentId], name, phone, personalid, center, note, sectionId};
   } else {
-    d.students.push({id:uid(),name,phone,personalid,center,note,sectionId,paid:false});
+    d.students.push({id:uid(), name, phone, personalid, center, note, sectionId, paid:false, paidAt:null});
   }
   saveData(); closeOverlay('doura-student-overlay'); renderDourat(activeDouraId);
 }
 
-function toggleDouraStudentPaid(douraIdx, stuIdx) {
-  dourat[douraIdx].students[stuIdx].paid=!dourat[douraIdx].students[stuIdx].paid;
-  saveData(); renderDourat(douraIdx);
-}
-
-function deleteDouraStudent(douraIdx, stuIdx) {
-  if (!confirm('حذف هذه المسجلة؟')) return;
-  dourat[douraIdx].students.splice(stuIdx,1); saveData(); renderDourat(douraIdx);
-}
-
-function archiveHalaqa(idx) {
-  const h = halaqat[idx];
-  if (!confirm(`هل تريدين أرشفة حلقة "${h.name}"؟\nستختفي من القائمة الرئيسية لكن بياناتها محفوظة.`)) return;
-  archivedHalaqat.push({...h, archivedAt: new Date().toISOString()});
-  halaqat.splice(idx, 1);
-  saveData(); renderHalaqat();
-}
-
-function restoreHalaqa(idx) {
+// ===================== ARCHIVE =====================
+function archiveHalaqaArchive(idx) {
   const h = archivedHalaqat[idx];
   delete h.archivedAt;
-  halaqat.push(h);
-  archivedHalaqat.splice(idx, 1);
+  halaqat.push(h); archivedHalaqat.splice(idx,1);
   saveData(); renderArchive();
-  alert(`✅ تم استعادة حلقة "${h.name}" بنجاح!`);
+  toast(`✅ تم استعادة حلقة "${h.name}"`);
 }
+function restoreHalaqa(idx) { archiveHalaqaArchive(idx); }
 
 function deleteArchivedHalaqa(idx) {
   const h = archivedHalaqat[idx];
   const count = students.filter(s=>(s.halaqat||[]).some(sh=>sh.hid===h.id)).length;
-  const msg = count > 0
-    ? `تحذير: ${count} طالبة مسجلة في هذه الحلقة وستُحذف منها أيضاً.\nهل أنت متأكدة من الحذف النهائي؟`
-    : 'هل أنت متأكدة من الحذف النهائي؟ لا يمكن التراجع.';
+  const msg = count>0 ? `تحذير: ${count} طالبة مسجلة في هذه الحلقة.\nهل أنت متأكدة من الحذف النهائي؟` : 'هل أنت متأكدة من الحذف النهائي؟';
   if (!confirm(msg)) return;
-  // Remove halaqa from all students
-  students.forEach(s => {
-    if (s.halaqat) s.halaqat = s.halaqat.filter(sh => sh.hid !== h.id);
-  });
-  archivedHalaqat.splice(idx, 1);
-  saveData(); renderArchive();
+  students.forEach(s=>{ if(s.halaqat) s.halaqat=s.halaqat.filter(sh=>sh.hid!==h.id); });
+  archivedHalaqat.splice(idx,1); saveData(); renderArchive();
+}
+
+function restoreDoura(idx) { dourat[idx].archived=false; saveData(); renderArchive(); toast('✅ تم استعادة الدورة!'); }
+function deleteArchivedDoura(idx) {
+  if (!confirm('هل أنت متأكدة من الحذف النهائي للدورة وكل بياناتها؟')) return;
+  dourat.splice(idx,1); saveData(); renderArchive();
 }
 
 function renderArchive() {
-  // Halaqat
   const tbody = document.getElementById('archive-tbody');
   if (!archivedHalaqat.length) {
     tbody.innerHTML = '<tr><td colspan="5"><div class="empty">لا توجد حلقات مؤرشفة</div></td></tr>';
   } else {
-    tbody.innerHTML = archivedHalaqat.map((h,i) => {
+    tbody.innerHTML = archivedHalaqat.map((h,i)=>{
       const count = students.filter(s=>(s.halaqat||[]).some(sh=>sh.hid===h.id)).length;
       const date = h.archivedAt ? new Date(h.archivedAt).toLocaleDateString('ar-BH') : '';
       return `<tr style="background:#fafaf8;">
         <td style="color:var(--text-muted);font-size:12px;">${i+1}</td>
         <td style="font-weight:600;color:var(--text-muted);">📦 ${esc(h.name)}<br/><span style="font-size:11px;font-weight:400;">أُرشف: ${date}</span></td>
-        <td style="color:var(--text-muted);">${h.amount} دينار</td>
+        <td style="color:var(--text-muted);">${h.amount} د.ب</td>
         <td style="color:var(--text-muted);">${count} طالبة</td>
         <td><div style="display:flex;gap:6px;">
           <button class="btn sm confirm" onclick="restoreHalaqa(${i})">↩ استعادة</button>
@@ -1042,21 +1593,19 @@ function renderArchive() {
       </tr>`;
     }).join('');
   }
-
-  // Dourat
   const archivedDourat = dourat.filter(d=>d.archived);
   const dtbody = document.getElementById('archive-dourat-tbody');
   if (!archivedDourat.length) {
     dtbody.innerHTML = '<tr><td colspan="5"><div class="empty">لا توجد دورات مؤرشفة</div></td></tr>';
   } else {
-    dtbody.innerHTML = archivedDourat.map((d,i) => {
+    dtbody.innerHTML = archivedDourat.map((d,i)=>{
       const realIdx = dourat.indexOf(d);
       const count = (d.students||[]).length;
       const paidCount = (d.students||[]).filter(s=>s.paid).length;
       return `<tr style="background:#fafaf8;">
         <td style="color:var(--text-muted);font-size:12px;">${i+1}</td>
         <td style="font-weight:600;color:var(--text-muted);">📦 ${esc(d.name)}${d.date?'<br/><span style="font-size:11px;font-weight:400;">'+esc(d.date)+'</span>':''}</td>
-        <td style="color:var(--text-muted);">${d.amount} دينار</td>
+        <td style="color:var(--text-muted);">—</td>
         <td style="color:var(--text-muted);">${count} مسجلة · دفعت ${paidCount}</td>
         <td><div style="display:flex;gap:6px;">
           <button class="btn sm confirm" onclick="restoreDoura(${realIdx})">↩ استعادة</button>
@@ -1067,306 +1616,11 @@ function renderArchive() {
   }
 }
 
-function restoreDoura(idx) {
-  dourat[idx].archived = false;
-  saveData(); renderArchive();
-  alert('✅ تم استعادة الدورة بنجاح!');
-}
-
-function deleteArchivedDoura(idx) {
-  if (!confirm('هل أنت متأكدة من الحذف النهائي للدورة وكل بياناتها؟')) return;
-  dourat.splice(idx,1); saveData(); renderArchive();
-}
-
-// OVERLAYS
-function overlayClick(id, e) {
-  if (e.target === document.getElementById(id)) closeOverlay(id);
-}
-function closeOverlay(id) { document.getElementById(id).classList.remove('open'); }
-function openOverlay(id) { document.getElementById(id).classList.add('open'); }
-
-// STATS
-function renderStats() {
-  const active = students.filter(s=>!s.paused);
-  const total = students.length;
-  let totalExpected = 0, totalPaid = 0, unpaidCount = 0;
-  active.forEach(s => {
-    let hasUnpaid = false;
-    (s.halaqat||[]).forEach(sh => {
-      const h = halaqat.find(h => h.id === sh.hid);
-      if (!h) return;
-      const eff = sh.feeType==='exempt' ? 0 : (sh.feeType==='reduced'||sh.feeType==='sponsored') ? (sh.customAmount||0) : h.amount;
-      totalExpected += eff;
-      if (sh.paid || sh.feeType==='exempt' || sh.feeType==='sponsored') totalPaid += eff;
-      else hasUnpaid = true;
-    });
-    if (hasUnpaid) unpaidCount++;
-  });
-  const paused = students.filter(s=>s.paused).length;
-  document.getElementById('stats').innerHTML = `
-    <div class="stat-card"><div class="stat-label">إجمالي الطالبات</div><div class="stat-value">${total}${paused?'<span style="font-size:13px;color:var(--text-muted);"> (⏸${paused})</span>':''}</div></div>
-    <div class="stat-card"><div class="stat-label">المبلغ المحصّل</div><div class="stat-value green">${totalPaid} د</div></div>
-    <div class="stat-card"><div class="stat-label">المبلغ المتبقي</div><div class="stat-value red">${totalExpected - totalPaid} د</div></div>
-    <div class="stat-card"><div class="stat-label">طالبات متأخرة</div><div class="stat-value amber">${unpaidCount}</div></div>
-  `;
-}
-
-// HALAQA FILTER
-function updateHalaqaFilter() {
-  const sel = document.getElementById('filter-halaqa');
-  const cur = sel.value;
-  sel.innerHTML = '<option value="all">كل الحلقات</option>' +
-    halaqat.map(h => `<option value="${h.id}"${cur===h.id?' selected':''}>${esc(h.name)}</option>`).join('');
-}
-
-// STUDENTS
-function renderStudents() {
-  renderStats();
-  updateHalaqaFilter();
-  const q = document.getElementById('search').value.trim().toLowerCase();
-  const fh = document.getElementById('filter-halaqa').value;
-  const fp = document.getElementById('filter-paid').value;
-
-  const list = students.map((s,i) => ({...s,_i:i})).filter(s => {
-    const mq = !q || s.name.toLowerCase().includes(q) || (s.phone||'').includes(q) || (s.userid||'').includes(q);
-    const mh = fh==='all' || (s.halaqat||[]).some(sh => sh.hid===fh);
-    const hasUnpaid = (s.halaqat||[]).some(sh => !sh.paid);
-    const mp = fp==='all' || (fp==='unpaid' ? hasUnpaid : !hasUnpaid);
-    return mq && mh && mp;
-  }).sort((a,b) => a.name.localeCompare(b.name, 'ar'));
-
-  const container = document.getElementById('students-list');
-  if (!list.length) { container.innerHTML = '<div class="empty">🔍 لا توجد نتائج</div>'; return; }
-
-  container.innerHTML = list.map(s => {
-    const sHalaqat = (s.halaqat||[]).map(sh => {
-      const h = halaqat.find(h => h.id===sh.hid);
-      return h ? {...sh, name:h.name, baseAmount:h.amount} : null;
-    }).filter(Boolean);
-
-    // Calculate effective amount per halaqa
-    const effectiveAmount = (sh) => {
-      if (sh.feeType === 'exempt') return 0;
-      if (sh.feeType === 'reduced' || sh.feeType === 'sponsored') return sh.customAmount||0;
-      return sh.baseAmount;
-    };
-
-    const hasUnpaid = sHalaqat.some(sh => sh.feeType!=='exempt' && sh.feeType!=='sponsored' && !sh.paid);
-    const totalOwed = sHalaqat.reduce((a,sh) => a+effectiveAmount(sh), 0);
-    const totalPaidAmt = sHalaqat.filter(sh=>sh.paid).reduce((a,sh) => a+effectiveAmount(sh), 0);
-    const halaqaBadges = sHalaqat.map(sh => `<span class="badge halaqa">${esc(sh.name)}</span>`).join('');
-
-    const statusBadge = s.paused
-      ? `<span class="badge" style="background:#f0eeea;color:var(--text-muted);">⏸ متوقفة</span>`
-      : !sHalaqat.length
-        ? `<span class="badge amber">بدون حلقة</span>`
-        : hasUnpaid
-          ? `<span class="badge unpaid">متأخرة ${totalOwed-totalPaidAmt} د</span>`
-          : `<span class="badge paid">✓ مكتملة</span>`;
-
-    const halaqaRows = sHalaqat.map(sh => {
-      const eff = effectiveAmount(sh);
-      const feeLabel = sh.feeType==='exempt' ? '<span class="badge" style="background:#f0eeea;color:var(--text-muted);">معفية</span>'
-        : sh.feeType==='reduced' ? `<span class="badge amber">مخفضة ${eff} د</span>`
-        : sh.feeType==='sponsored' ? `<span class="badge" style="background:var(--blue-light);color:var(--blue);">بكفالة ${eff} د</span>`
-        : '';
-      const isExemptOrSponsored = sh.feeType==='exempt' || sh.feeType==='sponsored';
-      return `<div class="halaqa-row" style="${s.paused?'opacity:0.5;pointer-events:none;':''}">
-        <div>
-          <div class="halaqa-name-txt">${esc(sh.name)} ${feeLabel}</div>
-          <div class="halaqa-amount-txt">${eff} دينار ${sh.feeType&&sh.feeType!=='normal'?'(الأصلي: '+sh.baseAmount+' د)':''}</div>
-        </div>
-        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
-          ${isExemptOrSponsored
-            ? `<span class="badge paid">✓ لا يلزم تذكير</span>`
-            : sh.paid
-              ? `<span class="badge paid">✓ دفعت</span>
-                 <button class="btn sm danger" onclick="toggleHalaqaPaid(${s._i},'${sh.hid}')">إلغاء</button>`
-              : `<span class="badge unpaid">✗ لم تدفع</span>
-                 <button class="btn sm confirm" onclick="toggleHalaqaPaid(${s._i},'${sh.hid}')">✓ تأكيد دفع</button>
-                 <a href="https://wa.me/${formatPhone(s.phone)}?text=${waMsg(s.name,sh.name)}" target="_blank" class="btn wa sm" style="text-decoration:none;">📲</a>`
-          }
-          <button class="btn sm" style="color:var(--text-muted);font-size:11px;" onclick="openFeeTypeModal(${s._i},'${sh.hid}')">⚙</button>
-        </div>
-      </div>`;
-    }).join('');
-
-    const noteHtml = s.note ? `<div class="student-note">📝 ${esc(s.note)}</div>` : '';
-    const pauseBtn = s.paused
-      ? `<button class="btn sm confirm" onclick="togglePaused(${s._i})">▶ تفعيل</button>`
-      : `<button class="btn sm" style="color:var(--text-muted);" onclick="togglePaused(${s._i})">⏸ إيقاف مؤقت</button>`;
-
-    return `<div class="student-card" style="${s.paused?'opacity:0.75;':''}">
-      <div class="student-header" onclick="toggleCard('sc-${s._i}')">
-        <div style="flex:1;min-width:0;">
-          <div class="student-name">${esc(s.name)}</div>
-          <div class="student-phone" dir="ltr" style="text-align:right;">
-            ${s.userid?'#'+esc(s.userid)+'  ·  ':''}${esc(s.phone||'')}
-          </div>
-          ${noteHtml}
-          <div style="margin-top:5px;">${halaqaBadges}</div>
-        </div>
-        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
-          ${statusBadge}
-          <span style="color:var(--text-muted);font-size:18px;">⌄</span>
-        </div>
-      </div>
-      <div class="student-body" id="sc-${s._i}">
-        ${halaqaRows||'<div style="font-size:13px;color:var(--text-muted);">لا توجد حلقات مسجلة</div>'}
-        <div class="student-actions">
-          <button class="btn sm" onclick="openStudentModal(${s._i})">✏ تعديل</button>
-          <button class="btn sm" style="color:var(--blue);" onclick="openEnrollModal(${s._i})">🌟 تسجيل في دورة</button>
-          ${pauseBtn}
-          <button class="btn sm danger" onclick="deleteStudent(${s._i})">🗑 حذف</button>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function togglePaused(idx) {
-  students[idx].paused = !students[idx].paused;
-  saveData(); renderStudents();
-}
-
-function toggleCard(id) {
-  const el = document.getElementById(id);
-  if (el) el.classList.toggle('open');
-}
-
-function toggleHalaqaPaid(studentIdx, hid) {
-  const sh = (students[studentIdx].halaqat||[]).find(sh => sh.hid===hid);
-  if (sh) { sh.paid = !sh.paid; saveData(); renderStudents(); }
-}
-
-function deleteStudent(idx) {
-  if (confirm('هل أنت متأكدة من حذف هذه الطالبة؟')) {
-    students.splice(idx,1); saveData(); renderStudents();
-  }
-}
-
-// STUDENT MODAL
-function openStudentModal(id=null) {
-  editStudentId = id;
-  document.getElementById('student-modal-title').textContent = id!==null ? 'تعديل بيانات الطالبة' : 'إضافة طالبة جديدة';
-  const s = id!==null ? students[id] : null;
-  document.getElementById('f-name').value = s ? s.name : '';
-  document.getElementById('f-userid').value = s ? (s.userid||'') : '';
-  document.getElementById('f-phone').value = s ? (s.phone||'') : '';
-  document.getElementById('f-note').value = s ? (s.note||'') : '';
-
-  const cl = document.getElementById('halaqa-checklist');
-  if (!halaqat.length) {
-    cl.innerHTML = '<div style="color:var(--text-muted);font-size:13px;padding:8px;">أضيفي حلقات أولاً من تبويب "الحلقات"</div>';
-  } else {
-    const enrolled = s ? (s.halaqat||[]).map(sh=>sh.hid) : [];
-    cl.innerHTML = halaqat.map(h => `
-      <label class="halaqa-check-item">
-        <input type="checkbox" value="${h.id}" ${enrolled.includes(h.id)?'checked':''}/>
-        <span class="halaqa-check-label">${esc(h.name)}</span>
-        <span class="halaqa-check-price">${h.amount} د</span>
-      </label>`).join('');
-  }
-  openOverlay('student-overlay');
-  document.getElementById('f-name').focus();
-}
-
-function saveStudent() {
-  const name = document.getElementById('f-name').value.trim();
-  const userid = document.getElementById('f-userid').value.trim();
-  const phone = document.getElementById('f-phone').value.trim();
-  const note = document.getElementById('f-note').value.trim();
-  if (!name) { alert('يرجى إدخال اسم الطالبة'); return; }
-  if (userid && !/^\d{8}$/.test(userid)) { alert('رقم المستخدم يجب أن يكون 8 أرقام'); return; }
-  if (phone && !/^\d{8}$/.test(phone)) { alert('رقم الهاتف يجب أن يكون 8 أرقام بالأرقام الإنجليزية'); return; }
-  // Check duplicate userid
-  if (userid) {
-    const dupIdx = students.findIndex((s,i) => s.userid===userid && i!==editStudentId);
-    if (dupIdx !== -1) { alert(`رقم المستخدم مستخدم بالفعل للطالبة: ${students[dupIdx].name}`); return; }
-  }
-  const checked = [...document.querySelectorAll('#halaqa-checklist input[type=checkbox]:checked')].map(c=>c.value);
-  if (editStudentId!==null) {
-    const existing = students[editStudentId].halaqat||[];
-    students[editStudentId] = {...students[editStudentId], name, userid, phone, note,
-      halaqat: checked.map(hid => existing.find(sh=>sh.hid===hid) || {hid, paid:false})
-    };
-  } else {
-    students.push({id:uid(), name, userid, phone, note, halaqat: checked.map(hid=>({hid,paid:false}))});
-  }
-  saveData(); closeOverlay('student-overlay'); renderStudents();
-}
-
-// HALAQAT
-function renderHalaqat() {
-  const tbody = document.getElementById('halaqat-tbody');
-  if (!halaqat.length) {
-    tbody.innerHTML = '<tr><td colspan="6"><div class="empty">لا توجد حلقات — أضيفي أول حلقة</div></td></tr>';
-    return;
-  }
-  tbody.innerHTML = halaqat.map((h,i) => {
-    const count = students.filter(s=>(s.halaqat||[]).some(sh=>sh.hid===h.id)).length;
-    return `<tr>
-      <td style="color:var(--text-muted);font-size:12px;">${i+1}</td>
-      <td style="font-weight:600;">${esc(h.name)}</td>
-      <td style="color:var(--text-muted);">${esc(h.teacher||'—')}</td>
-      <td style="color:var(--text-muted);">${esc(h.supervisor||'—')}</td>
-      <td>${h.amount} دينار</td>
-      <td>${count} طالبة</td>
-      <td><div style="display:flex;gap:6px;">
-        <button class="btn sm" onclick="openHalaqaModal(${i})">✏ تعديل</button>
-        <button class="btn sm" style="color:var(--amber);" onclick="archiveHalaqa(${i})">📦 أرشفة</button>
-        <button class="btn sm danger" onclick="deleteHalaqa(${i})">🗑 حذف</button>
-      </div></td>
-    </tr>`;
-  }).join('');
-}
-
-function openHalaqaModal(id=null) {
-  editHalaqaId = id;
-  document.getElementById('halaqa-modal-title').textContent = id!==null ? 'تعديل الحلقة' : 'إضافة حلقة جديدة';
-  const h = id!==null ? halaqat[id] : null;
-  document.getElementById('h-name').value = h ? h.name : '';
-  document.getElementById('h-teacher').value = h ? (h.teacher||'') : '';
-  document.getElementById('h-supervisor').value = h ? (h.supervisor||'') : '';
-  document.getElementById('h-amount').value = h ? h.amount : '';
-  openOverlay('halaqa-overlay');
-  document.getElementById('h-name').focus();
-}
-
-function saveHalaqa() {
-  const name = document.getElementById('h-name').value.trim();
-  const teacher = document.getElementById('h-teacher').value.trim();
-  const supervisor = document.getElementById('h-supervisor').value.trim();
-  const amount = parseFloat(document.getElementById('h-amount').value)||0;
-  if (!name) { alert('يرجى إدخال اسم الحلقة'); return; }
-  if (editHalaqaId!==null) {
-    halaqat[editHalaqaId] = {...halaqat[editHalaqaId], name, teacher, supervisor, amount};
-  } else {
-    halaqat.push({id:uid(), name, teacher, supervisor, amount});
-  }
-  saveData(); closeOverlay('halaqa-overlay'); renderHalaqat();
-}
-
-function deleteHalaqa(idx) {
-  const h = halaqat[idx];
-  const used = students.filter(s=>(s.halaqat||[]).some(sh=>sh.hid===h.id)).length;
-  if (used>0) { alert(`لا يمكن الحذف — ${used} طالبة مسجلة في هذه الحلقة.`); return; }
-  if (confirm('هل أنت متأكدة من حذف هذه الحلقة؟')) {
-    halaqat.splice(idx,1); saveData(); renderHalaqat();
-  }
-}
-
-// WHATSAPP
-function waMsg(name, halaqaName) {
-  return encodeURIComponent(waTemplate + (halaqaName ? '\n('+halaqaName+')' : ''));
-}
-
+// ===================== WHATSAPP =====================
 function openBulkModal() {
-  const seen = new Set();
-  const unpaid = [];
+  const seen = new Set(); const unpaid = [];
   students.forEach(s => {
-    // Only include if has unpaid non-exempt non-sponsored halaqat
-    const hasUnpaid = (s.halaqat||[]).some(sh => sh.feeType!=='exempt' && sh.feeType!=='sponsored' && !sh.paid);
+    const hasUnpaid = (s.halaqat||[]).some(sh=>sh.feeType!=='exempt'&&sh.feeType!=='sponsored'&&!sh.paid);
     if (hasUnpaid && !seen.has(s.phone)) { seen.add(s.phone); unpaid.push(s); }
   });
   if (!unpaid.length) { alert('🎉 جميع الطالبات مكتملات الدفع!'); return; }
@@ -1374,102 +1628,117 @@ function openBulkModal() {
   document.getElementById('bulk-msg-preview').textContent = waTemplate;
   document.getElementById('bulk-list').innerHTML = unpaid.map(s => {
     const phone = formatPhone(s.phone);
-    const msgEnc = encodeURIComponent(waTemplate);
     return `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--gray-bg);border-radius:var(--radius);gap:8px;">
       <span style="font-size:14px;font-weight:500;">${esc(s.name)}</span>
-      <a href="https://wa.me/${phone}?text=${msgEnc}" target="_blank" class="btn wa sm" style="text-decoration:none;">📲 إرسال</a>
+      <a href="https://wa.me/${phone}?text=${encodeURIComponent(waTemplate)}" target="_blank" class="btn wa sm" style="text-decoration:none;">📲 إرسال</a>
     </div>`;
   }).join('');
   openOverlay('bulk-overlay');
 }
 
-function openMsgModal() {
-  document.getElementById('wa-msg-text').value = waTemplate;
-  openOverlay('msg-overlay');
-}
-
+function openMsgModal() { document.getElementById('wa-msg-text').value=waTemplate; openOverlay('msg-overlay'); }
 function saveMsgTemplate() {
   waTemplate = document.getElementById('wa-msg-text').value.trim();
   if (!waTemplate) { alert('الرسالة لا يمكن أن تكون فارغة'); return; }
   localStorage.setItem('hifz_wa_msg', waTemplate);
-  closeOverlay('msg-overlay');
-  alert('✅ تم حفظ الرسالة!');
+  closeOverlay('msg-overlay'); toast('✅ تم حفظ الرسالة!');
 }
 
-// EXPORT / IMPORT
+// ===================== EXPORT / IMPORT =====================
 function exportData() {
   const data = {halaqat, archivedHalaqat, students, dourat, semester, exportedAt: new Date().toISOString(), version:3};
   const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json;charset=utf-8;'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   const date = new Date().toLocaleDateString('ar-BH').replace(/\//g,'-');
-  a.href = url;
-  a.download = 'بيانات_مركز_شيخان_' + date + '.json';
-  a.click();
-  URL.revokeObjectURL(url);
+  a.href = url; a.download = 'بيانات_'+(centerName||'مركز')+'_'+date+'.json';
+  a.click(); URL.revokeObjectURL(url);
 }
 
 function importData(event) {
-  const file = event.target.files[0];
-  if (!file) return;
+  const file = event.target.files[0]; if (!file) return;
   const reader = new FileReader();
   reader.onload = function(e) {
     try {
       const data = JSON.parse(e.target.result);
       if (!data.students || !data.halaqat) throw new Error();
       pendingImport = data;
+      const sCount=(data.students||[]).length, hCount=(data.halaqat||[]).length, dCount=(data.dourat||[]).length;
+      const exportDate = data.exportedAt ? new Date(data.exportedAt).toLocaleDateString('ar-BH') : '—';
+      document.getElementById('import-file-info').innerHTML =
+        `📄 <strong>${file.name}</strong><br/>تاريخ الحفظ: ${exportDate}<br/>${hCount} حلقة · ${sCount} طالبة · ${dCount} دورة`;
+      document.querySelector('input[name="import-mode"][value="merge"]').checked = true;
       document.getElementById('import-confirm-btn').onclick = function() {
-        halaqat = pendingImport.halaqat;
-        students = pendingImport.students;
-        archivedHalaqat = pendingImport.archivedHalaqat || [];
-        dourat = pendingImport.dourat || [];
-        semester = pendingImport.semester || 'الفصل الأول';
-        saveData();
-        closeOverlay('import-overlay');
-        renderStudents();
-        alert('✅ تم استيراد البيانات بنجاح!');
+        const mode = document.querySelector('input[name="import-mode"]:checked').value;
+        if (mode==='replace') {
+          if (!confirm('⚠️ سيتم مسح كل البيانات الحالية. متابعة؟')) return;
+          halaqat=pendingImport.halaqat; students=pendingImport.students;
+          archivedHalaqat=pendingImport.archivedHalaqat||[]; dourat=pendingImport.dourat||[];
+          semester=pendingImport.semester||'الفصل الأول';
+          saveData(); closeOverlay('import-overlay'); renderStudents(); updateSemesterLabel();
+          toast('✅ تم استيراد البيانات بنجاح!');
+        } else {
+          let addedH=0, addedS=0, addedD=0, skippedH=0, skippedS=0, skippedD=0;
+          (pendingImport.halaqat||[]).forEach(h=>{
+            if(halaqat.find(ex=>ex.name===h.name)){skippedH++;return;}
+            halaqat.push({...h,id:h.id||uid()}); addedH++;
+          });
+          (pendingImport.archivedHalaqat||[]).forEach(h=>{
+            if(!archivedHalaqat.find(ex=>ex.name===h.name)) archivedHalaqat.push({...h,id:h.id||uid()});
+          });
+          (pendingImport.students||[]).forEach(s=>{
+            if(students.find(ex=>ex.name===s.name&&(ex.phone===s.phone||(!ex.phone&&!s.phone)))){skippedS++;return;}
+            const remapped=(s.halaqat||[]).map(sh=>{
+              const srcH=(pendingImport.halaqat||[]).find(h=>h.id===sh.hid);
+              if(!srcH) return null;
+              const localH=halaqat.find(h=>h.name===srcH.name);
+              return localH?{...sh,hid:localH.id}:null;
+            }).filter(Boolean);
+            students.push({...s,id:s.id||uid(),halaqat:remapped}); addedS++;
+          });
+          (pendingImport.dourat||[]).forEach(d=>{
+            if(dourat.find(ex=>ex.name===d.name)){skippedD++;return;}
+            dourat.push({...d,id:d.id||uid()}); addedD++;
+          });
+          saveData(); closeOverlay('import-overlay'); renderStudents(); updateSemesterLabel();
+          alert(`✅ تم الدمج بنجاح!\n\n➕ أُضيف:\n• ${addedH} حلقة جديدة\n• ${addedS} طالبة جديدة\n• ${addedD} دورة جديدة\n\n${skippedH||skippedS||skippedD?`⏭ تم تخطي:\n• ${skippedH} حلقة · ${skippedS} طالبة · ${skippedD} دورة`:''}`);
+        }
       };
       openOverlay('import-overlay');
-    } catch(err) {
-      alert('❌ الملف غير صحيح. يرجى استخدام ملف JSON محفوظ من التطبيق.');
-    }
+    } catch(err) { alert('❌ الملف غير صحيح.'); }
   };
   reader.readAsText(file);
   event.target.value = '';
 }
 
-document.addEventListener('keydown', e => {
-  if (e.key==='Escape') ['student-overlay','halaqa-overlay','bulk-overlay','import-overlay','doura-overlay','doura-student-overlay','renewal-overlay','enroll-overlay','msg-overlay','feetype-overlay','doura-feetype-overlay','center-settings-overlay','excel-import-overlay'].forEach(closeOverlay);
-});
-
-updateSemesterLabel();
-renderStudents();
-
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js');
+async function confirmDeleteAll() {
+  const ok = await showConfirm('⚠️ مسح كل البيانات','سيتم حذف جميع الطالبات والحلقات والدورات نهائياً.\nهذا الإجراء لا يمكن التراجع عنه.','🗑 مسح الكل','danger','⚠️');
+  if (!ok) return;
+  const word = prompt('للتأكيد، اكتب كلمة "حذف":');
+  if (word!=='حذف') { toast('تم الإلغاء', 'info'); return; }
+  halaqat=[]; archivedHalaqat=[]; students=[]; dourat=[];
+  saveData(); renderStudents(); toast('✅ تم مسح جميع البيانات', 'success');
 }
-let enrollStudentIdx = null;
 
+// ===================== ENROLL =====================
 function openEnrollModal(studentIdx) {
   const activeDours = dourat.filter(d=>!d.archived);
-  if (!activeDours.length) { alert('لا توجد دورات نشطة. أضيفي دورة أولاً من تبويب الدورات والأنشطة.'); return; }
+  if (!activeDours.length) { alert('لا توجد دورات نشطة. أضيفي دورة أولاً.'); return; }
   enrollStudentIdx = studentIdx;
   const s = students[studentIdx];
   document.getElementById('enroll-student-name').textContent = '👩‍🎓 ' + s.name;
   document.getElementById('enroll-note').value = '';
   const dSel = document.getElementById('enroll-doura-select');
-  dSel.innerHTML = activeDours.map(d => `<option value="${d.id}">${esc(d.name)}</option>`).join('');
-  updateEnrollSections();
-  openOverlay('enroll-overlay');
+  dSel.innerHTML = activeDours.map(d=>`<option value="${d.id}">${esc(d.name)}</option>`).join('');
+  updateEnrollSections(); openOverlay('enroll-overlay');
 }
 
 function updateEnrollSections() {
   const douraId = document.getElementById('enroll-doura-select').value;
-  const d = dourat.find(d=>d.id===douraId);
-  if (!d) return;
+  const d = dourat.find(d=>d.id===douraId); if (!d) return;
   const sections = d.sections||[{id:'default',name:'عام',amount:d.amount||0}];
-  document.getElementById('enroll-section-select').innerHTML = sections.map(sec =>
-    `<option value="${sec.id}">${esc(sec.name)} — ${sec.amount} دينار</option>`
+  document.getElementById('enroll-section-select').innerHTML = sections.map(sec=>
+    `<option value="${sec.id}">${esc(sec.name)} — ${sec.amount} د.ب</option>`
   ).join('');
 }
 
@@ -1477,233 +1746,451 @@ function confirmEnroll() {
   const douraId = document.getElementById('enroll-doura-select').value;
   const sectionId = document.getElementById('enroll-section-select').value;
   const note = document.getElementById('enroll-note').value.trim();
-  const d = dourat.find(d=>d.id===douraId);
-  if (!d) return;
+  const d = dourat.find(d=>d.id===douraId); if (!d) return;
   const s = students[enrollStudentIdx];
-  // Check if already enrolled
-  if ((d.students||[]).some(st=>st.phone===s.phone)) {
-    alert('هذه الطالبة مسجلة في هذه الدورة بالفعل!');
-    return;
-  }
+  if ((d.students||[]).some(st=>st.phone===s.phone)) { alert('هذه الطالبة مسجلة في هذه الدورة بالفعل!'); return; }
   if (!d.students) d.students = [];
-  d.students.push({id:uid(), name:s.name, phone:s.phone, note, sectionId, paid:false});
-  saveData();
-  closeOverlay('enroll-overlay');
-  alert(`✅ تم تسجيل ${s.name} في ${d.name} بنجاح!`);
+  d.students.push({id:uid(), name:s.name, phone:s.phone, note, sectionId, paid:false, paidAt:null});
+  saveData(); closeOverlay('enroll-overlay');
+  toast(`✅ تم تسجيل ${s.name} في ${d.name}`);
 }
-let feeTypeStudentIdx = null;
-let feeTypeHid = null;
-let feeTypeDouraIdx = null;
-let feeTypeStuIdx = null;
 
+// ===================== FEE TYPE =====================
 function updateFeeTypeFields() {
   const t = document.getElementById('feetype-select').value;
   const g = document.getElementById('feetype-amount-group');
-  const l = document.getElementById('feetype-amount-label');
-  g.style.display = (t==='reduced'||t==='sponsored') ? 'block' : 'none';
-  l.textContent = t==='sponsored' ? 'المبلغ المدفوع من الكفيل (دينار)' : 'المبلغ المخفض (دينار)';
+  g.style.display = (t==='reduced'||t==='sponsored')?'block':'none';
+  document.getElementById('feetype-amount-label').textContent = t==='sponsored'?'المبلغ المدفوع من الكفيل (د.ب)':'المبلغ المخفض (د.ب)';
 }
-
 function openFeeTypeModal(studentIdx, hid) {
-  feeTypeStudentIdx = studentIdx;
-  feeTypeHid = hid;
-  const s = students[studentIdx];
-  const sh = (s.halaqat||[]).find(sh=>sh.hid===hid);
-  const h = halaqat.find(h=>h.id===hid);
-  document.getElementById('feetype-student-info').textContent = `${s.name} — ${h?h.name:''}`;
-  document.getElementById('feetype-select').value = sh.feeType||'normal';
-  document.getElementById('feetype-amount').value = sh.customAmount||'';
-  updateFeeTypeFields();
-  openOverlay('feetype-overlay');
+  feeTypeStudentIdx=studentIdx; feeTypeHid=hid;
+  const s=students[studentIdx]; const sh=(s.halaqat||[]).find(sh=>sh.hid===hid);
+  const h=halaqat.find(h=>h.id===hid);
+  document.getElementById('feetype-student-info').textContent=`${s.name} — ${h?h.name:''}`;
+  document.getElementById('feetype-select').value=sh.feeType||'normal';
+  document.getElementById('feetype-amount').value=sh.customAmount||'';
+  updateFeeTypeFields(); openOverlay('feetype-overlay');
 }
-
 function saveFeeType() {
-  const sh = (students[feeTypeStudentIdx].halaqat||[]).find(sh=>sh.hid===feeTypeHid);
-  if (!sh) return;
-  sh.feeType = document.getElementById('feetype-select').value;
-  sh.customAmount = parseFloat(document.getElementById('feetype-amount').value)||0;
-  if (sh.feeType==='exempt'||sh.feeType==='sponsored') sh.paid = false;
+  const sh=(students[feeTypeStudentIdx].halaqat||[]).find(sh=>sh.hid===feeTypeHid);
+  if(!sh) return;
+  sh.feeType=document.getElementById('feetype-select').value;
+  sh.customAmount=parseFloat(document.getElementById('feetype-amount').value)||0;
+  if(sh.feeType==='exempt'||sh.feeType==='sponsored'){ sh.paid=false; sh.paidAt=null; }
   saveData(); closeOverlay('feetype-overlay'); renderStudents();
 }
 
 function updateDouraFeeTypeFields() {
-  const t = document.getElementById('doura-feetype-select').value;
-  const g = document.getElementById('doura-feetype-amount-group');
-  const l = document.getElementById('doura-feetype-amount-label');
-  g.style.display = (t==='reduced'||t==='sponsored') ? 'block' : 'none';
-  l.textContent = t==='sponsored' ? 'المبلغ المدفوع من الكفيل (دينار)' : 'المبلغ المخفض (دينار)';
+  const t=document.getElementById('doura-feetype-select').value;
+  document.getElementById('doura-feetype-amount-group').style.display=(t==='reduced'||t==='sponsored')?'block':'none';
+  document.getElementById('doura-feetype-amount-label').textContent=t==='sponsored'?'المبلغ المدفوع من الكفيل (د.ب)':'المبلغ المخفض (د.ب)';
 }
-
 function openDouraFeeTypeModal(douraIdx, stuIdx) {
-  feeTypeDouraIdx = douraIdx;
-  feeTypeStuIdx = stuIdx;
-  const s = dourat[douraIdx].students[stuIdx];
-  const d = dourat[douraIdx];
-  document.getElementById('doura-feetype-info').textContent = `${s.name} — ${d.name}`;
-  document.getElementById('doura-feetype-select').value = s.feeType||'normal';
-  document.getElementById('doura-feetype-amount').value = s.customAmount||'';
-  updateDouraFeeTypeFields();
-  openOverlay('doura-feetype-overlay');
+  feeTypeDouraIdx=douraIdx; feeTypeStuIdx=stuIdx;
+  const s=dourat[douraIdx].students[stuIdx]; const d=dourat[douraIdx];
+  document.getElementById('doura-feetype-info').textContent=`${s.name} — ${d.name}`;
+  document.getElementById('doura-feetype-select').value=s.feeType||'normal';
+  document.getElementById('doura-feetype-amount').value=s.customAmount||'';
+  updateDouraFeeTypeFields(); openOverlay('doura-feetype-overlay');
 }
-
 function saveDouraFeeType() {
-  const s = dourat[feeTypeDouraIdx].students[feeTypeStuIdx];
-  s.feeType = document.getElementById('doura-feetype-select').value;
-  s.customAmount = parseFloat(document.getElementById('doura-feetype-amount').value)||0;
-  if (s.feeType==='exempt'||s.feeType==='sponsored') s.paid = false;
+  const s=dourat[feeTypeDouraIdx].students[feeTypeStuIdx];
+  s.feeType=document.getElementById('doura-feetype-select').value;
+  s.customAmount=parseFloat(document.getElementById('doura-feetype-amount').value)||0;
+  if(s.feeType==='exempt'||s.feeType==='sponsored'){ s.paid=false; s.paidAt=null; }
   saveData(); closeOverlay('doura-feetype-overlay'); renderDourat(feeTypeDouraIdx);
 }
 
-// INIT
-if (!waTemplate) {
-  waTemplate = '\u0627\u0644\u0633\u0644\u0627\u0645 \u0639\u0644\u064a\u0643\u0645 \u0648\u0631\u062d\u0645\u0629 \u0627\u0644\u0644\u0647 \u0648\u0628\u0631\u0643\u0627\u062a\u0647\n\u0646\u0630\u0643\u0651\u0631\u0643\u0645 \u0628\u0633\u062f\u0627\u062f \u0631\u0633\u0648\u0645 \u0627\u0644\u062a\u0633\u062c\u064a\u0644\n\u062c\u0632\u0627\u0643\u0645 \u0627\u0644\u0644\u0647 \u062e\u064a\u0631\u0627\u064b.';
+// ===================== REPORTS =====================
+function calcHalaqaStats(h) {
+  const studs = students.filter(s=>!s.paused&&(s.halaqat||[]).some(sh=>sh.hid===h.id));
+  let expected=0, paid=0;
+  let exemptCount=0, sponsoredCount=0, reducedCount=0;
+  studs.forEach(s=>{
+    const sh=(s.halaqat||[]).find(sh=>sh.hid===h.id); if(!sh) return;
+    const eff=sh.feeType==='exempt'?0:(sh.feeType==='reduced'||sh.feeType==='sponsored')?(sh.customAmount||0):h.amount;
+    expected+=eff;
+    if(sh.feeType==='exempt') exemptCount++;
+    else if(sh.feeType==='sponsored'){sponsoredCount++; paid+=eff;}
+    else if(sh.feeType==='reduced'){reducedCount++; if(sh.paid) paid+=eff;}
+    else {if(sh.paid) paid+=eff;}
+  });
+  const paidCount=studs.filter(s=>{const sh=(s.halaqat||[]).find(sh=>sh.hid===h.id);return sh&&(sh.paid||sh.feeType==='exempt'||sh.feeType==='sponsored');}).length;
+  return {studs, expected, paid, unpaid:expected-paid, exemptCount, sponsoredCount, reducedCount, paidCount};
 }
 
-applyCenter();
-updateSemesterLabel();
-renderStudents();
-
-if (!centerName) {
-  document.getElementById('setup-screen').style.display = 'flex';
+function calcDouraStats(d) {
+  const sections=d.sections||[{id:'default',name:'عام',amount:d.amount||0}];
+  const studs=d.students||[];
+  const effAmt=s=>{
+    const sec=sections.find(sec=>sec.id===s.sectionId)||sections[0];
+    const base=sec?sec.amount:0;
+    return s.feeType==='exempt'?0:(s.feeType==='reduced'||s.feeType==='sponsored')?(s.customAmount||0):base;
+  };
+  let expected=0, paid=0;
+  studs.forEach(s=>{expected+=effAmt(s); if(s.paid||s.feeType==='exempt'||s.feeType==='sponsored') paid+=effAmt(s);});
+  return {studs, sections, expected, paid, unpaid:expected-paid, paidCount:studs.filter(s=>s.paid||s.feeType==='exempt'||s.feeType==='sponsored').length, effAmt};
 }
 
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js');
+function renderReports() {
+  const filter = document.getElementById('rpt-filter').value;
+  const container = document.getElementById('report-content');
+  let html = `<div id="print-area">`;
+
+  html += `<div style="display:none;" id="rpt-print-header">
+    <div style="text-align:center;margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid #0F6E56;">
+      <div style="font-size:22px;font-weight:700;color:#0F6E56;">${esc(centerName)}</div>
+      <div style="font-size:13px;color:#666;margin-top:4px;">تقرير الفصل الدراسي · ${esc(semester)} · ${new Date().toLocaleDateString('ar-BH')}</div>
+    </div>
+  </div>`;
+
+  let totalExpected=0, totalPaid=0, totalStudents=0, totalUnpaid=0;
+  if (filter==='all'||filter==='halaqat') {
+    halaqat.forEach(h=>{const s=calcHalaqaStats(h);totalExpected+=s.expected;totalPaid+=s.paid;totalStudents+=s.studs.length;totalUnpaid+=s.studs.filter(st=>{const sh=(st.halaqat||[]).find(sh=>sh.hid===h.id);return sh&&!sh.paid&&sh.feeType!=='exempt'&&sh.feeType!=='sponsored';}).length;});
+  }
+  if (filter==='all'||filter==='dourat') {
+    dourat.filter(d=>!d.archived).forEach(d=>{const s=calcDouraStats(d);totalExpected+=s.expected;totalPaid+=s.paid;totalStudents+=s.studs.length;totalUnpaid+=s.studs.filter(st=>!st.paid&&st.feeType!=='exempt'&&st.feeType!=='sponsored').length;});
+  }
+  const pct = totalExpected>0 ? Math.round(totalPaid/totalExpected*100) : 0;
+
+  html += `<div class="rpt-section" style="margin-bottom:20px;">
+    <div class="rpt-header"><h3>📊 الملخص العام — ${esc(semester)}</h3><span>${new Date().toLocaleDateString('ar-BH')}</span></div>
+    <div class="rpt-summary">
+      <div class="rpt-stat"><div class="rpt-stat-val">${totalStudents}</div><div class="rpt-stat-label">إجمالي المسجلات</div></div>
+      <div class="rpt-stat"><div class="rpt-stat-val">${totalPaid} د.ب</div><div class="rpt-stat-label">المحصّل</div></div>
+      <div class="rpt-stat"><div class="rpt-stat-val red">${totalExpected-totalPaid} د.ب</div><div class="rpt-stat-label">المتبقي</div></div>
+      <div class="rpt-stat"><div class="rpt-stat-val amber">${totalUnpaid}</div><div class="rpt-stat-label">متأخرات</div></div>
+      <div class="rpt-stat"><div class="rpt-stat-val">${pct}%</div><div class="rpt-stat-label">نسبة التحصيل</div></div>
+    </div>
+    <div style="padding:12px 16px;">
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted);margin-bottom:6px;"><span>نسبة التحصيل</span><span>${pct}%</span></div>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${pct}%;background:${pct>=80?'var(--green)':pct>=50?'var(--amber)':'var(--red)'}"></div></div>
+    </div>
+  </div>`;
+
+  if ((filter==='all'||filter==='halaqat') && halaqat.length) {
+    html += `<div class="rpt-section"><div class="rpt-header"><h3>📚 تقرير الحلقات</h3><span>${halaqat.length} حلقة</span></div>`;
+    halaqat.forEach(h=>{
+      const st=calcHalaqaStats(h);
+      const pct2=st.expected>0?Math.round(st.paid/st.expected*100):100;
+      const unpaidStuds=st.studs.filter(s=>{const sh=(s.halaqat||[]).find(sh=>sh.hid===h.id);return sh&&!sh.paid&&sh.feeType!=='exempt'&&sh.feeType!=='sponsored';});
+      html += `<div style="padding:14px 16px;border-bottom:1px solid var(--gray-border);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+          <div><div style="font-weight:600;font-size:14px;">${esc(h.name)}</div>
+          <div style="font-size:12px;color:var(--text-muted);">${h.teacher?'المعلمة: '+esc(h.teacher)+' · ':''} ${st.studs.length} طالبة · ${h.amount} د.ب/فصل</div></div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <span class="badge paid">${st.paid} د.ب محصّل</span>
+            <span class="badge unpaid">${st.unpaid} د.ب متبقي</span>
+            <button class="btn sm no-print" onclick="printHalaqaSheet('${h.id}')">🖨 كشف</button>
+          </div>
+        </div>
+        <div class="progress-bar-wrap" style="margin-bottom:10px;"><div class="progress-bar-fill" style="width:${pct2}%;background:${pct2>=80?'var(--green)':pct2>=50?'var(--amber)':'var(--red)'}"></div></div>
+        <table class="rpt-table">
+          <thead><tr><th>#</th><th>الاسم</th><th>الهاتف</th><th>الرسوم</th><th>الحالة</th><th>تاريخ الدفع</th></tr></thead>
+          <tbody>
+            ${st.studs.sort((a,b)=>a.name.localeCompare(b.name,'ar')).map((s,i)=>{
+              const sh=(s.halaqat||[]).find(sh=>sh.hid===h.id);
+              const eff=sh.feeType==='exempt'?0:(sh.feeType==='reduced'||sh.feeType==='sponsored')?(sh.customAmount||0):h.amount;
+              const statusBadge=sh.feeType==='exempt'?'<span class="badge" style="background:#f0eeea;color:var(--text-muted);">معفية</span>'
+                :sh.feeType==='sponsored'?'<span class="badge" style="background:var(--blue-light);color:var(--blue);">بكفالة</span>'
+                :sh.paid?'<span class="badge paid">✓ دفعت</span>'
+                :'<span class="badge unpaid">✗ لم تدفع</span>';
+              const dateStr = sh.paid && sh.paidAt ? `<span style="font-size:11px;color:var(--green-dark);">📅 ${fmtDate(sh.paidAt)}</span>` : '—';
+              return `<tr><td style="color:var(--text-muted)">${i+1}</td><td style="font-weight:500">${esc(s.name)}</td><td dir="ltr" style="color:var(--text-muted)">${esc(s.phone||'—')}</td><td>${eff} د.ب</td><td>${statusBadge}</td><td>${dateStr}</td></tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+        ${unpaidStuds.length?`<div style="margin-top:10px;padding:10px;background:var(--red-light);border-radius:var(--radius);font-size:12px;"><strong style="color:var(--red);">لم يدفعن (${unpaidStuds.length}):</strong> ${unpaidStuds.map(s=>esc(s.name)).join('، ')}</div>`:`<div style="margin-top:8px;font-size:12px;color:var(--green-dark);">✅ جميع الطالبات مكتملات الدفع</div>`}
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  const activeDours = dourat.filter(d=>!d.archived);
+  if ((filter==='all'||filter==='dourat') && activeDours.length) {
+    html += `<div class="rpt-section"><div class="rpt-header" style="background:var(--amber);"><h3>🌟 تقرير الدورات والأنشطة</h3><span>${activeDours.length} دورة</span></div>`;
+    activeDours.forEach(d=>{
+      const st=calcDouraStats(d);
+      const pct3=st.expected>0?Math.round(st.paid/st.expected*100):100;
+      const unpaidD=st.studs.filter(s=>!s.paid&&s.feeType!=='exempt'&&s.feeType!=='sponsored');
+      html += `<div style="padding:14px 16px;border-bottom:1px solid var(--gray-border);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+          <div><div style="font-weight:600;font-size:14px;">${esc(d.name)}</div>
+          <div style="font-size:12px;color:var(--text-muted);">${d.date?esc(d.date)+' · ':''} ${st.studs.length} مسجلة</div></div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <span class="badge paid">${st.paid} د.ب محصّل</span>
+            <span class="badge unpaid">${st.unpaid} د.ب متبقي</span>
+            <button class="btn sm no-print" onclick="printDouraSheet('${d.id}')">🖨 كشف</button>
+          </div>
+        </div>
+        <div class="progress-bar-wrap" style="margin-bottom:10px;"><div class="progress-bar-fill" style="width:${pct3}%;background:${pct3>=80?'var(--green)':pct3>=50?'var(--amber)':'var(--red)'}"></div></div>
+        <table class="rpt-table">
+          <thead><tr><th>#</th><th>الاسم</th><th>الهاتف</th><th>القسم</th><th>الرسوم</th><th>الحالة</th><th>تاريخ الدفع</th></tr></thead>
+          <tbody>
+            ${st.studs.slice().sort((a,b)=>a.name.localeCompare(b.name,'ar')).map((s,i)=>{
+              const sec=st.sections.find(sec=>sec.id===s.sectionId)||st.sections[0];
+              const eff=st.effAmt(s);
+              const statusBadge=s.feeType==='exempt'?'<span class="badge" style="background:#f0eeea;color:var(--text-muted);">معفية</span>'
+                :s.feeType==='sponsored'?'<span class="badge" style="background:var(--blue-light);color:var(--blue);">بكفالة</span>'
+                :s.paid?'<span class="badge paid">✓ دفعت</span>'
+                :'<span class="badge unpaid">✗ لم تدفع</span>';
+              const dateStr = s.paid && s.paidAt ? `<span style="font-size:11px;color:var(--green-dark);">📅 ${fmtDate(s.paidAt)}</span>` : '—';
+              return `<tr><td style="color:var(--text-muted)">${i+1}</td><td style="font-weight:500">${esc(s.name)}</td><td dir="ltr" style="color:var(--text-muted)">${esc(s.phone||'—')}</td><td>${esc(sec?sec.name:'—')}</td><td>${eff} د.ب</td><td>${statusBadge}</td><td>${dateStr}</td></tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+        ${unpaidD.length?`<div style="margin-top:10px;padding:10px;background:var(--red-light);border-radius:var(--radius);font-size:12px;"><strong style="color:var(--red);">لم يدفعن (${unpaidD.length}):</strong> ${unpaidD.map(s=>esc(s.name)).join('، ')}</div>`:`<div style="margin-top:8px;font-size:12px;color:var(--green-dark);">✅ جميع المسجلات مكتملات الدفع</div>`}
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  if (!halaqat.length && !activeDours.length) html += `<div class="empty">لا توجد بيانات لعرض التقارير</div>`;
+  html += `</div>`;
+  container.innerHTML = html;
+  document.getElementById('rpt-print-header').style.display = 'none';
+}
+
+function printReport() {
+  document.getElementById('rpt-print-header').style.display = 'block';
+  document.querySelectorAll('.no-print').forEach(el=>el.style.display='none');
+  window.print();
+  setTimeout(()=>{ document.querySelectorAll('.no-print').forEach(el=>el.style.display=''); document.getElementById('rpt-print-header').style.display='none'; }, 1000);
+}
+
+function printHalaqaSheet(hid) {
+  const h = halaqat.find(h=>h.id===hid); if (!h) return;
+  const st = calcHalaqaStats(h);
+  const rows = st.studs.sort((a,b)=>a.name.localeCompare(b.name,'ar')).map((s,i)=>{
+    const sh=(s.halaqat||[]).find(sh=>sh.hid===hid);
+    const eff=sh.feeType==='exempt'?0:(sh.feeType==='reduced'||sh.feeType==='sponsored')?(sh.customAmount||0):h.amount;
+    const status=sh.feeType==='exempt'?'معفية':sh.feeType==='sponsored'?'بكفالة':sh.paid?'✓ دفعت':'✗ لم تدفع';
+    const statusColor=sh.paid||sh.feeType==='exempt'||sh.feeType==='sponsored'?'#0F6E56':'#E24B4A';
+    const dateStr = sh.paid && sh.paidAt ? fmtDate(sh.paidAt) : '—';
+    return `<tr><td style="width:30px;text-align:center;">${i+1}</td><td style="min-width:140px;">${esc(s.name)}</td><td style="width:90px;" dir="ltr">${esc(s.phone||'—')}</td><td style="width:60px;text-align:center;">${eff} د.ب</td><td style="width:70px;text-align:center;color:${statusColor};font-weight:600;">${status}</td><td style="width:85px;text-align:center;font-size:11px;color:#555;">${dateStr}</td><td style="width:80px;"></td></tr>`;
+  }).join('');
+  const win = window.open('','_blank');
+  win.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width"/>
+  <style>*{box-sizing:border-box;}body{font-family:Tahoma,Arial,sans-serif;padding:16px;color:#111;font-size:12px;margin:0;}
+  h2{color:#0F6E56;margin-bottom:2px;font-size:15px;}.meta{color:#666;font-size:11px;margin-bottom:12px;}
+  table{width:100%;border-collapse:collapse;table-layout:fixed;}
+  th{background:#0F6E56;color:#fff;padding:7px 8px;text-align:right;font-size:11px;white-space:nowrap;}
+  td{padding:6px 8px;border-bottom:1px solid #eee;word-wrap:break-word;vertical-align:middle;line-height:1.4;}
+  .summary{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px;padding:10px;background:#f5f5f5;border-radius:6px;}
+  .s-item{text-align:center;min-width:60px;}.s-val{font-size:16px;font-weight:700;color:#0F6E56;}.s-lbl{font-size:10px;color:#666;}
+  .sign{margin-top:24px;display:flex;justify-content:space-between;font-size:11px;color:#666;}
+  @media print{button{display:none;}body{padding:10px;}tr{page-break-inside:avoid;}}</style></head><body>
+  <h2>${esc(centerName)} — كشف حلقة ${esc(h.name)}</h2>
+  <div class="meta">${h.teacher?'المعلمة: '+esc(h.teacher)+' · ':''}${h.supervisor?'المشرفة: '+esc(h.supervisor)+' · ':''}الفصل: ${esc(semester)} · ${new Date().toLocaleDateString('ar-BH')}</div>
+  <div class="summary">
+    <div class="s-item"><div class="s-val">${st.studs.length}</div><div class="s-lbl">إجمالي</div></div>
+    <div class="s-item"><div class="s-val" style="color:#0F6E56">${st.paidCount}</div><div class="s-lbl">دفعن</div></div>
+    <div class="s-item"><div class="s-val" style="color:#E24B4A">${st.studs.length-st.paidCount}</div><div class="s-lbl">لم يدفعن</div></div>
+    <div class="s-item"><div class="s-val">${st.paid} د.ب</div><div class="s-lbl">محصّل</div></div>
+    <div class="s-item"><div class="s-val" style="color:#E24B4A">${st.unpaid} د.ب</div><div class="s-lbl">متبقي</div></div>
+  </div>
+  <table><thead><tr><th style="width:30px;">#</th><th>الاسم</th><th style="width:90px;">الهاتف</th><th style="width:60px;">الرسوم</th><th style="width:70px;">الحالة</th><th style="width:85px;">تاريخ الدفع</th><th style="width:80px;">توقيع</th></tr></thead>
+  <tbody>${rows}</tbody></table>
+  <div class="sign"><span>توقيع المعلمة: ________________</span><span>توقيع المشرفة: ________________</span></div>
+  <script>window.onload=()=>window.print();<\/script></body></html>`);
+  win.document.close();
+}
+
+function printDouraSheet(did) {
+  const d = dourat.find(d=>d.id===did); if (!d) return;
+  const st = calcDouraStats(d);
+  const rows = st.studs.slice().sort((a,b)=>a.name.localeCompare(b.name,'ar')).map((s,i)=>{
+    const sec=st.sections.find(sec=>sec.id===s.sectionId)||st.sections[0];
+    const eff=st.effAmt(s);
+    const status=s.feeType==='exempt'?'معفية':s.feeType==='sponsored'?'بكفالة':s.paid?'✓ دفعت':'✗ لم تدفع';
+    const statusColor=s.paid||s.feeType==='exempt'||s.feeType==='sponsored'?'#0F6E56':'#E24B4A';
+    const dateStr = s.paid && s.paidAt ? fmtDate(s.paidAt) : '—';
+    return `<tr><td style="width:30px;text-align:center;">${i+1}</td><td style="min-width:130px;">${esc(s.name)}</td><td style="width:90px;" dir="ltr">${esc(s.phone||'—')}</td><td style="width:70px;">${esc(sec?sec.name:'—')}</td><td style="width:60px;text-align:center;">${eff} د.ب</td><td style="width:70px;text-align:center;color:${statusColor};font-weight:600;">${status}</td><td style="width:85px;text-align:center;font-size:11px;color:#555;">${dateStr}</td><td style="width:80px;"></td></tr>`;
+  }).join('');
+  const win = window.open('','_blank');
+  win.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width"/>
+  <style>*{box-sizing:border-box;}body{font-family:Tahoma,Arial,sans-serif;padding:16px;color:#111;font-size:12px;margin:0;}
+  h2{color:#BA7517;margin-bottom:2px;font-size:15px;}.meta{color:#666;font-size:11px;margin-bottom:12px;}
+  table{width:100%;border-collapse:collapse;table-layout:fixed;}
+  th{background:#BA7517;color:#fff;padding:7px 8px;text-align:right;font-size:11px;white-space:nowrap;}
+  td{padding:6px 8px;border-bottom:1px solid #eee;word-wrap:break-word;vertical-align:middle;line-height:1.4;}
+  .summary{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px;padding:10px;background:#f5f5f5;border-radius:6px;}
+  .s-item{text-align:center;min-width:60px;}.s-val{font-size:16px;font-weight:700;color:#BA7517;}.s-lbl{font-size:10px;color:#666;}
+  @media print{button{display:none;}body{padding:10px;}tr{page-break-inside:avoid;}}</style></head><body>
+  <h2>${esc(centerName)} — كشف ${esc(d.name)}</h2>
+  <div class="meta">${d.date?esc(d.date)+' · ':''}تاريخ الطباعة: ${new Date().toLocaleDateString('ar-BH')}</div>
+  <div class="summary">
+    <div class="s-item"><div class="s-val">${st.studs.length}</div><div class="s-lbl">إجمالي</div></div>
+    <div class="s-item"><div class="s-val" style="color:#0F6E56">${st.paidCount}</div><div class="s-lbl">دفعن</div></div>
+    <div class="s-item"><div class="s-val" style="color:#E24B4A">${st.studs.length-st.paidCount}</div><div class="s-lbl">لم يدفعن</div></div>
+    <div class="s-item"><div class="s-val">${st.paid} د.ب</div><div class="s-lbl">محصّل</div></div>
+    <div class="s-item"><div class="s-val" style="color:#E24B4A">${st.unpaid} د.ب</div><div class="s-lbl">متبقي</div></div>
+    ${st.sections.map(sec=>`<div class="s-item"><div class="s-val">${(d.students||[]).filter(s=>s.sectionId===sec.id).length}</div><div class="s-lbl">${esc(sec.name)}</div></div>`).join('')}
+  </div>
+  <table><thead><tr><th style="width:30px;">#</th><th>الاسم</th><th style="width:90px;">الهاتف</th><th style="width:70px;">القسم</th><th style="width:60px;">الرسوم</th><th style="width:70px;">الحالة</th><th style="width:85px;">تاريخ الدفع</th><th style="width:80px;">توقيع</th></tr></thead>
+  <tbody>${rows}</tbody></table>
+  <script>window.onload=()=>window.print();<\/script></body></html>`);
+  win.document.close();
+}
+
+function exportReportExcel() {
+  if (typeof XLSX==='undefined') { alert('مكتبة Excel غير متوفرة'); return; }
+  const wb = XLSX.utils.book_new();
+  if (halaqat.length) {
+    const data=[['الحلقة','المعلمة','إجمالي الطالبات','المحصّل','المتبقي','نسبة التحصيل']];
+    halaqat.forEach(h=>{const st=calcHalaqaStats(h);const pct=st.expected>0?Math.round(st.paid/st.expected*100):100;data.push([h.name,h.teacher||'—',st.studs.length,st.paid,st.unpaid,pct+'%']);});
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(data), 'الحلقات');
+  }
+  if (students.length) {
+    const data=[['الاسم','الهاتف','رقم المستخدم','الحلقات','الحالة','تاريخ آخر دفع']];
+    students.forEach(s=>{
+      const names=(s.halaqat||[]).map(sh=>{const h=halaqat.find(h=>h.id===sh.hid);return h?h.name:'';}).filter(Boolean).join(' / ');
+      const hasUnpaid=(s.halaqat||[]).some(sh=>!sh.paid&&sh.feeType!=='exempt'&&sh.feeType!=='sponsored');
+      const lastPaid=(s.halaqat||[]).filter(sh=>sh.paid&&sh.paidAt).sort((a,b)=>new Date(b.paidAt)-new Date(a.paidAt));
+      data.push([s.name,s.phone||'',s.userid||'',names,s.paused?'متوقفة':hasUnpaid?'متأخرة':'مكتملة',lastPaid.length?fmtDate(lastPaid[0].paidAt):'—']);
+    });
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(data), 'الطالبات');
+  }
+  dourat.filter(d=>!d.archived).forEach(d=>{
+    const st=calcDouraStats(d);
+    const data=[['الاسم','الهاتف','القسم','الرسوم','الحالة','تاريخ الدفع']];
+    st.studs.forEach(s=>{
+      const sec=st.sections.find(sec=>sec.id===s.sectionId)||st.sections[0];
+      const status=s.feeType==='exempt'?'معفية':s.feeType==='sponsored'?'بكفالة':s.paid?'دفعت':'لم تدفع';
+      data.push([s.name,s.phone||'',sec?sec.name:'—',st.effAmt(s),status,s.paid&&s.paidAt?fmtDate(s.paidAt):'—']);
+    });
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(data), d.name.slice(0,30));
+  });
+  const date=new Date().toLocaleDateString('ar-BH').replace(/\//g,'-');
+  XLSX.writeFile(wb, `تقرير_${centerName||'مركز'}_${date}.xlsx`);
 }
 
 // ===================== EXCEL IMPORT =====================
-let excelRows = [];
-let excelHeaders = [];
+let excelRows=[], excelHeaders=[];
 
 function openExcelImportModal() {
-  const activeDours = dourat.filter(d=>!d.archived);
+  const activeDours=dourat.filter(d=>!d.archived);
   if (!activeDours.length) { alert('أضيفي دورة أولاً'); return; }
-  document.getElementById('excel-doura-select').innerHTML = activeDours.map(d=>`<option value="${d.id}">${esc(d.name)}</option>`).join('');
-  document.getElementById('excel-step1').style.display = 'block';
-  document.getElementById('excel-step2').style.display = 'none';
-  document.getElementById('excel-import-btn').style.display = 'none';
-  document.getElementById('excel-file-name').textContent = '';
-  excelRows = []; excelHeaders = [];
+  document.getElementById('excel-doura-select').innerHTML=activeDours.map(d=>`<option value="${d.id}">${esc(d.name)}</option>`).join('');
+  document.getElementById('excel-step1').style.display='block';
+  document.getElementById('excel-step2').style.display='none';
+  document.getElementById('excel-import-btn').style.display='none';
+  document.getElementById('excel-file-name').textContent='';
+  excelRows=[]; excelHeaders=[];
   openOverlay('excel-import-overlay');
 }
 
 function handleExcelFile(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  document.getElementById('excel-file-name').textContent = file.name;
-  excelRows = []; excelHeaders = [];
-
-  const isCsv = file.name.toLowerCase().endsWith('.csv');
-  const reader = new FileReader();
-
+  const file=event.target.files[0]; if (!file) return;
+  document.getElementById('excel-file-name').textContent=file.name;
+  excelRows=[]; excelHeaders=[];
+  const isCsv=file.name.toLowerCase().endsWith('.csv');
+  const reader=new FileReader();
   if (isCsv) {
-    reader.onload = function(e) {
-      const text = e.target.result;
-      const lines = text.split(/\r?\n/).filter(l=>l.trim());
+    reader.onload=e=>{
+      const text=e.target.result;
+      const lines=text.split(/\r?\n/).filter(l=>l.trim());
       if (!lines.length) { alert('الملف فارغ'); return; }
-      // Detect delimiter
-      const delim = lines[0].includes('\t') ? '\t' : ',';
-      const parseRow = l => l.split(delim).map(c=>c.replace(/^"|"$/g,'').trim());
-      excelHeaders = parseRow(lines[0]);
-      excelRows = lines.slice(1).map(line=>{
-        const cols = parseRow(line);
-        const row = {};
-        excelHeaders.forEach((h,i)=>row[h]=cols[i]||'');
-        return row;
-      }).filter(r=>excelHeaders.some(h=>r[h]));
+      const delim=lines[0].includes('\t')?'\t':',';
+      const parseRow=l=>l.split(delim).map(c=>c.replace(/^"|"$/g,'').trim());
+      excelHeaders=parseRow(lines[0]);
+      excelRows=lines.slice(1).map(line=>{const cols=parseRow(line);const row={};excelHeaders.forEach((h,i)=>row[h]=cols[i]||'');return row;}).filter(r=>excelHeaders.some(h=>r[h]));
       setupColumnMapping();
     };
-    reader.readAsText(file, 'UTF-8');
+    reader.readAsText(file,'UTF-8');
   } else {
-    // xlsx/xls
-    reader.onload = function(e) {
+    reader.onload=e=>{
       try {
-        if (typeof XLSX === 'undefined') {
-          alert('مكتبة قراءة Excel لم تتحمل. تأكدي من الاتصال بالإنترنت أو حولي الملف لـ CSV.');
-          return;
-        }
-        const data = new Uint8Array(e.target.result);
-        const wb = XLSX.read(data, {type:'array'});
-        const ws = wb.Sheets[wb.SheetNames[0]];
-        const json = XLSX.utils.sheet_to_json(ws, {defval:'', raw:false});
+        if (typeof XLSX==='undefined') { alert('مكتبة Excel لم تتحمل.'); return; }
+        const data=new Uint8Array(e.target.result);
+        const wb=XLSX.read(data,{type:'array'});
+        const ws=wb.Sheets[wb.SheetNames[0]];
+        const json=XLSX.utils.sheet_to_json(ws,{defval:'',raw:false});
         if (!json.length) { alert('لم يتم العثور على بيانات في الملف'); return; }
-        excelHeaders = Object.keys(json[0]);
-        excelRows = json;
+        excelHeaders=Object.keys(json[0]); excelRows=json;
         setupColumnMapping();
-      } catch(err) {
-        alert('تعذر قراءة الملف: ' + err.message + '\nجربي تحويله لـ CSV.');
-      }
+      } catch(err) { alert('تعذر قراءة الملف: '+err.message); }
     };
     reader.readAsArrayBuffer(file);
   }
 }
 
 function setupColumnMapping() {
-  const none = '<option value="">-- لا يوجد --</option>';
-  const opts = none + excelHeaders.map(h=>`<option value="${esc(h)}">${esc(h)}</option>`).join('');
-  ['map-name','map-phone','map-personalid','map-center'].forEach(id=>{
-    document.getElementById(id).innerHTML = opts;
-  });
-  // Auto-detect common column names
-  const autoMap = {
-    'map-name': ['اسم','name','الاسم','اسم الطالبة','الاسم الكامل'],
-    'map-phone': ['هاتف','phone','جوال','رقم','موبايل','تلفون'],
-    'map-personalid': ['شخصي','id','رقم شخصي','رقم هوية','هوية'],
-    'map-center': ['مركز','center','المركز','اسم المركز']
-  };
-  Object.entries(autoMap).forEach(([field, keywords])=>{
-    const match = excelHeaders.find(h=>keywords.some(k=>h.toLowerCase().includes(k.toLowerCase())));
-    if (match) document.getElementById(field).value = match;
-  });
-
-  // Section select for excel
-  const douraId = document.getElementById('excel-doura-select').value;
-  const d = dourat.find(d=>d.id===douraId);
-  const sections = d ? (d.sections||[{id:'default',name:'عام',amount:0}]) : [];
-  document.getElementById('excel-section-select').innerHTML = sections.map(s=>`<option value="${s.id}">${esc(s.name)} — ${s.amount} د</option>`).join('');
-
-  // Preview
-  const prev = document.getElementById('excel-preview');
-  prev.innerHTML = '<strong>معاينة (أول 3 صفوف):</strong><br/>' +
-    excelRows.slice(0,3).map(r=>Object.entries(r).map(([k,v])=>`${k}: ${v}`).join(' | ')).join('<br/>');
-
-  document.getElementById('excel-step1').style.display = 'block';
-  document.getElementById('excel-step2').style.display = 'block';
-  document.getElementById('excel-import-btn').style.display = 'inline-flex';
+  const none='<option value="">-- لا يوجد --</option>';
+  const opts=none+excelHeaders.map(h=>`<option value="${esc(h)}">${esc(h)}</option>`).join('');
+  ['map-name','map-phone','map-personalid','map-center'].forEach(id=>{ document.getElementById(id).innerHTML=opts; });
+  const autoMap={'map-name':['اسم','name','الاسم','اسم الطالبة','الاسم الكامل'],'map-phone':['هاتف','phone','جوال','رقم','موبايل'],'map-personalid':['شخصي','id','رقم شخصي','هوية'],'map-center':['مركز','center','المركز']};
+  Object.entries(autoMap).forEach(([field,keywords])=>{const match=excelHeaders.find(h=>keywords.some(k=>h.toLowerCase().includes(k.toLowerCase())));if(match) document.getElementById(field).value=match;});
+  const douraId=document.getElementById('excel-doura-select').value;
+  const d=dourat.find(d=>d.id===douraId);
+  const sections=d?(d.sections||[{id:'default',name:'عام',amount:0}]):[];
+  document.getElementById('excel-section-select').innerHTML=sections.map(s=>`<option value="${s.id}">${esc(s.name)} — ${s.amount} د.ب</option>`).join('');
+  const prev=document.getElementById('excel-preview');
+  prev.innerHTML='<strong>معاينة (أول 3 صفوف):</strong><br/>'+excelRows.slice(0,3).map(r=>Object.entries(r).map(([k,v])=>`${k}: ${v}`).join(' | ')).join('<br/>');
+  document.getElementById('excel-step1').style.display='block';
+  document.getElementById('excel-step2').style.display='block';
+  document.getElementById('excel-import-btn').style.display='inline-flex';
 }
 
 function confirmExcelImport() {
-  const douraId = document.getElementById('excel-doura-select').value;
-  const d = dourat.find(d=>d.id===douraId);
+  const douraId=document.getElementById('excel-doura-select').value;
+  const d=dourat.find(d=>d.id===douraId);
   if (!d) { alert('اختاري الدورة أولاً'); return; }
-  if (!excelRows || !excelRows.length) { alert('لا توجد بيانات — يرجى رفع الملف أولاً'); return; }
-  if (!d.students) d.students = [];
-
-  const colName = document.getElementById('map-name').value;
-  const colPhone = document.getElementById('map-phone').value;
-  const colPersonalid = document.getElementById('map-personalid').value;
-  const colCenter = document.getElementById('map-center').value;
-  const sectionId = document.getElementById('excel-section-select').value;
-
+  if (!excelRows||!excelRows.length) { alert('لا توجد بيانات'); return; }
+  if (!d.students) d.students=[];
+  const colName=document.getElementById('map-name').value;
+  const colPhone=document.getElementById('map-phone').value;
+  const colPersonalid=document.getElementById('map-personalid').value;
+  const colCenter=document.getElementById('map-center').value;
+  const sectionId=document.getElementById('excel-section-select').value;
   if (!colName) { alert('يرجى تحديد عمود اسم الطالبة'); return; }
-
-  let added = 0, skipped = 0;
-  excelRows.forEach(row => {
-    const name = String(row[colName]||'').trim();
+  let added=0, skipped=0;
+  excelRows.forEach(row=>{
+    const name=String(row[colName]||'').trim();
     if (!name) { skipped++; return; }
-    const phone = colPhone ? String(row[colPhone]||'').trim() : '';
-    const personalid = colPersonalid ? String(row[colPersonalid]||'').trim() : '';
-    const center = colCenter ? String(row[colCenter]||'').trim() : '';
-    d.students.push({id:uid(), name, phone, personalid, center, note:'', sectionId, paid:false});
+    const phone=colPhone?String(row[colPhone]||'').trim():'';
+    const personalid=colPersonalid?String(row[colPersonalid]||'').trim():'';
+    const center=colCenter?String(row[colCenter]||'').trim():'';
+    d.students.push({id:uid(),name,phone,personalid,center,note:'',sectionId,paid:false,paidAt:null});
     added++;
   });
+  if (added===0) { alert('لم يتم إضافة أي سجل'); return; }
+  saveData(); closeOverlay('excel-import-overlay'); renderDourat(dourat.indexOf(d));
+  alert('تم استيراد '+added+' مسجلة بنجاح!'+(skipped?'\n(تم تخطي '+skipped+' صف فارغ)':''));
+}
 
-  if (added === 0) { alert('لم يتم إضافة أي سجل — تأكدي من تحديد عمود الاسم بشكل صحيح'); return; }
+// ===================== INIT =====================
+if (!waTemplate) waTemplate = 'السلام عليكم ورحمة الله وبركاته\nنذكّركم بسداد رسوم التسجيل\nجزاكم الله خيراً.';
 
-  saveData();
-  closeOverlay('excel-import-overlay');
-  renderDourat(dourat.indexOf(d));
-  alert('تم استيراد ' + added + ' مسجلة بنجاح!' + (skipped ? '\n(تم تخطي ' + skipped + ' صف فارغ)' : ''));
+applyCenter();
+updateSemesterLabel();
+
+if (!centerName) {
+  document.getElementById('setup-screen').style.display = 'flex';
+} else {
+  renderStudents();
+  initLock();
+  scheduleBackup();
+  if (students.length || halaqat.length) setTimeout(autoBackup, 5*60*1000);
+}
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').then(reg=>{
+    reg.update();
+    reg.addEventListener('updatefound', ()=>{
+      const newWorker=reg.installing;
+      newWorker.addEventListener('statechange', ()=>{
+        if (newWorker.state==='installed'&&navigator.serviceWorker.controller) {
+          navigator.serviceWorker.controller.postMessage({action:'skipWaiting'});
+          window.location.reload();
+        }
+      });
+    });
+  });
+  let refreshing=false;
+  navigator.serviceWorker.addEventListener('controllerchange', ()=>{
+    if (!refreshing) { refreshing=true; window.location.reload(); }
+  });
 }
 </script>
 </body>
