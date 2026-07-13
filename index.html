@@ -11,11 +11,7 @@
 <meta name="mobile-web-app-capable" content="yes"/>
 <link rel="manifest" href="manifest.json"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<title>مركز — نظام متابعة الطالبات والرسوم</title>
-<meta name="description" content="نظام إدارة الطالبات والحلقات والدورات ومتابعة الرسوم لمراكز التحفيظ."/>
-<meta property="og:title" content="نظام متابعة الطالبات والرسوم"/>
-<meta property="og:description" content="نظام إدارة الطالبات والحلقات والدورات ومتابعة الرسوم لمراكز التحفيظ."/>
-<meta property="og:type" content="website"/>
+<title>مركز شيخان وشريفة الفارسي</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap');
 :root{
@@ -71,7 +67,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--gray-bg);color:var(--text
 .btn.danger:hover{background:var(--red-light);border-color:#f0b0b0;}
 .btn.confirm{color:var(--green-dark);}
 .btn.confirm:hover{background:var(--green-light);}
-.btn.paymethod{display:flex;flex-direction:column;align-items:center;gap:4px;line-height:1.4;}
 
 input[type=text],input[type=number],select,textarea{font-family:'Tajawal',sans-serif;font-size:14px;padding:8px 11px;border:1px solid var(--gray-border);border-radius:var(--radius);background:var(--white);color:var(--text);outline:none;transition:border-color .15s;width:100%;}
 input:focus,select:focus,textarea:focus{border-color:var(--green);}
@@ -365,8 +360,8 @@ tr:hover td{background:#fdfcfa;}
         <button class="dropdown-item" onclick="closeDropdown();openCenterSettings()">⚙️ إعدادات المركز</button>
         <button class="dropdown-item blue" onclick="closeDropdown();openRenewalModal()">🔄 تجديد الفصل</button>
         <div class="dropdown-divider"></div>
-        <button class="dropdown-item" onclick="closeDropdown();exportData()">💾 حفظ البيانات</button>
-        <button class="dropdown-item" onclick="closeDropdown();openBackupManager()">📦 النسخ الاحتياطية</button>
+        <button class="dropdown-item" onclick="closeDropdown();exportData()">💾 حفظ البيانات يدوياً</button>
+        <button class="dropdown-item" onclick="closeDropdown();openBackupCenter()">📦 مركز النسخ الاحتياطية</button>
         <label class="dropdown-item" style="cursor:pointer;">
           📂 استيراد بيانات
           <input type="file" accept=".json" onchange="closeDropdown();importData(event)" style="display:none"/>
@@ -421,9 +416,9 @@ tr:hover td{background:#fdfcfa;}
       <button class="btn primary" onclick="openHalaqaModal()">+ إضافة حلقة</button>
     </div>
     <div class="card" style="overflow-x:auto;">
-      <table style="min-width:760px;">
+      <table style="min-width:600px;">
         <thead>
-          <tr><th>#</th><th>اسم الحلقة</th><th>النوع</th><th>الوقت</th><th>المعلمة</th><th>المشرفة</th><th>المبلغ الفصلي</th><th>عدد الطالبات</th><th>إجراءات</th></tr>
+          <tr><th>#</th><th>اسم الحلقة</th><th>المعلمة</th><th>المشرفة</th><th>المبلغ الفصلي</th><th>عدد الطالبات</th><th>إجراءات</th></tr>
         </thead>
         <tbody id="halaqat-tbody"></tbody>
       </table>
@@ -491,7 +486,6 @@ tr:hover td{background:#fdfcfa;}
     <h2 id="student-modal-title">إضافة طالبة جديدة</h2>
     <div class="form-group"><label>اسم الطالبة</label><input type="text" id="f-name" placeholder="الاسم الكامل"/></div>
     <div class="form-group"><label>رقم المستخدم (برنامج إقراء)</label><input type="text" id="f-userid" placeholder="12345678" dir="ltr" maxlength="8" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,8)"/></div>
-    <div class="form-group"><label>الرقم الشخصي (اختياري)</label><input type="text" id="f-personalid" placeholder="000000000" dir="ltr" maxlength="9" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,9)"/></div>
     <div class="form-group"><label>رقم الهاتف (8 أرقام - إنجليزي)</label><input type="text" id="f-phone" placeholder="12345678" dir="ltr" maxlength="8" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,8)"/></div>
     <div class="form-group"><label>ملاحظة (اختياري)</label><input type="text" id="f-note" placeholder="مثال: مسجلة في حلقتين"/></div>
     <div class="form-group"><label>الحلقات المسجلة فيها</label><div class="halaqa-check-list" id="halaqa-checklist"></div></div>
@@ -507,15 +501,6 @@ tr:hover td{background:#fdfcfa;}
   <div class="modal" onclick="event.stopPropagation()">
     <h2 id="halaqa-modal-title">إضافة حلقة جديدة</h2>
     <div class="form-group"><label>اسم الحلقة</label><input type="text" id="h-name" placeholder="مثال: حلقة الفجر"/></div>
-    <div class="form-group"><label>نوع الحلقة (اختياري)</label><input type="text" id="h-type" placeholder="مثال: تحفيظ / تجويد / مراجعة"/></div>
-    <div class="form-group">
-      <label>وقت الحلقة</label>
-      <select id="h-time">
-        <option value="">-- غير محدد --</option>
-        <option value="صباحي">☀️ صباحي</option>
-        <option value="مسائي">🌙 مسائي</option>
-      </select>
-    </div>
     <div class="form-group"><label>اسم المعلمة</label><input type="text" id="h-teacher" placeholder="مثال: أم عبدالله"/></div>
     <div class="form-group"><label>اسم المشرفة</label><input type="text" id="h-supervisor" placeholder="مثال: أم محمد"/></div>
     <div class="form-group"><label>المبلغ الفصلي (د.ب)</label><input type="number" id="h-amount" placeholder="10" min="0"/></div>
@@ -679,21 +664,6 @@ tr:hover td{background:#fdfcfa;}
   </div>
 </div>
 
-<!-- PAYMENT METHOD MODAL -->
-<div class="overlay" id="paymethod-overlay" onclick="overlayClick('paymethod-overlay',event)">
-  <div class="modal" style="width:340px;" onclick="event.stopPropagation()">
-    <h2>💳 طريقة الدفع</h2>
-    <div id="paymethod-info" style="font-size:13px;color:var(--text-muted);margin-bottom:16px;"></div>
-    <div style="display:flex;gap:10px;">
-      <button class="btn confirm paymethod" style="flex:1;padding:16px 8px;font-size:14px;" onclick="confirmPaymentMethod('cash')">💵 كاش</button>
-      <button class="btn confirm paymethod" style="flex:1;padding:16px 8px;font-size:14px;" onclick="confirmPaymentMethod('benefit')">🏦 بنفت</button>
-    </div>
-    <div class="modal-footer">
-      <button class="btn" onclick="closeOverlay('paymethod-overlay')">إلغاء</button>
-    </div>
-  </div>
-</div>
-
 <!-- FEE TYPE MODAL (دورات) -->
 <div class="overlay" id="doura-feetype-overlay" onclick="overlayClick('doura-feetype-overlay',event)">
   <div class="modal" style="width:380px;" onclick="event.stopPropagation()">
@@ -746,6 +716,101 @@ tr:hover td{background:#fdfcfa;}
     <div class="modal-footer">
       <button class="btn" onclick="closeOverlay('excel-import-overlay')">إلغاء</button>
       <button class="btn primary" id="excel-import-btn" style="display:none;" onclick="confirmExcelImport()">✅ استيراد</button>
+    </div>
+  </div>
+</div>
+
+<!-- BACKUP CENTER MODAL -->
+<div class="overlay" id="backup-center-overlay" onclick="overlayClick('backup-center-overlay',event)">
+  <div class="modal" style="width:480px;" onclick="event.stopPropagation()">
+    <h2>📦 مركز النسخ الاحتياطية</h2>
+
+    <!-- Status bar -->
+    <div id="bc-status" style="background:var(--gray-bg);border-radius:var(--radius);padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--text-muted);line-height:1.8;"></div>
+
+    <!-- Tabs -->
+    <div style="display:flex;gap:0;border:1px solid var(--gray-border);border-radius:var(--radius);overflow:hidden;margin-bottom:14px;">
+      <button id="bc-tab-local" class="btn" style="flex:1;border:none;border-radius:0;border-left:1px solid var(--gray-border);background:var(--green);color:#fff;" onclick="bcTab('local')">💾 محلي</button>
+      <button id="bc-tab-drive" class="btn" style="flex:1;border:none;border-radius:0;" onclick="bcTab('drive')">☁️ Google Drive</button>
+      <button id="bc-tab-auto" class="btn" style="flex:1;border:none;border-radius:0;" onclick="bcTab('auto')">⚙️ الجدول</button>
+    </div>
+
+    <!-- LOCAL TAB -->
+    <div id="bc-panel-local">
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+        <button class="btn primary" onclick="bcDownloadNow()" style="flex:1;">⬇️ تنزيل نسخة الآن</button>
+        <label class="btn amber" style="cursor:pointer;flex:1;justify-content:center;">
+          📂 استعادة من ملف
+          <input type="file" accept=".json" onchange="bcRestoreFromFile(event)" style="display:none"/>
+        </label>
+      </div>
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;font-weight:600;">النسخ المحفوظة داخلياً (آخر 5):</div>
+      <div id="bc-local-list" style="display:flex;flex-direction:column;gap:6px;"></div>
+    </div>
+
+    <!-- DRIVE TAB -->
+    <div id="bc-panel-drive" style="display:none;">
+      <div id="bc-drive-auth" style="text-align:center;padding:20px 0;">
+        <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px;line-height:1.8;">
+          اربطي حساب Google Drive لحفظ النسخ الاحتياطية تلقائياً على السحابة
+        </div>
+        <button class="btn primary" style="width:100%;justify-content:center;" onclick="bcConnectDrive()">
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" style="width:18px;height:18px;"/> تسجيل الدخول بـ Google
+        </button>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:10px;">
+          📁 سيتم حفظ الملفات في مجلد "متابعة_ميزانية_المركز" في Drive
+        </div>
+      </div>
+      <div id="bc-drive-connected" style="display:none;">
+        <div id="bc-drive-user" style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--green-light);border-radius:var(--radius);margin-bottom:12px;font-size:13px;color:var(--green-dark);font-weight:600;"></div>
+        <div style="display:flex;gap:8px;margin-bottom:12px;">
+          <button class="btn primary" onclick="bcBackupToDrive()" style="flex:1;">☁️ رفع نسخة الآن</button>
+          <button class="btn" onclick="bcListDriveFiles()" style="flex:1;">🔄 تحديث القائمة</button>
+          <button class="btn danger" onclick="bcDisconnectDrive()">قطع الاتصال</button>
+        </div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;font-weight:600;">الملفات المحفوظة في Drive:</div>
+        <div id="bc-drive-list" style="display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto;"></div>
+      </div>
+    </div>
+
+    <!-- AUTO TAB -->
+    <div id="bc-panel-auto" style="display:none;">
+      <div style="font-size:13px;color:var(--text-muted);margin-bottom:14px;line-height:1.8;">
+        ضبطي جدول النسخ الاحتياطية التلقائية:
+      </div>
+
+      <div class="form-group">
+        <label>النسخ المحلي التلقائي (داخل المتصفح)</label>
+        <select id="bc-local-interval" onchange="bcSaveAutoSettings()">
+          <option value="1800000">كل 30 دقيقة</option>
+          <option value="3600000">كل ساعة</option>
+          <option value="86400000" selected>كل 24 ساعة</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>التنزيل التلقائي على الجهاز</label>
+        <select id="bc-download-interval" onchange="bcSaveAutoSettings()">
+          <option value="0">معطّل</option>
+          <option value="86400000" selected>كل 24 ساعة</option>
+          <option value="604800000">كل أسبوع</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>النسخ التلقائي على Google Drive</label>
+        <select id="bc-drive-interval" onchange="bcSaveAutoSettings()">
+          <option value="0">معطّل</option>
+          <option value="86400000" selected>كل 24 ساعة</option>
+          <option value="604800000">كل أسبوع</option>
+        </select>
+      </div>
+
+      <div id="bc-auto-status" style="font-size:12px;color:var(--green-dark);margin-top:8px;"></div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn" onclick="closeOverlay('backup-center-overlay')">إغلاق</button>
     </div>
   </div>
 </div>
@@ -848,7 +913,7 @@ document.addEventListener('keydown', e => {
     else if (e.key === 'Backspace') pinDel();
     return;
   }
-  if (e.key === 'Escape') ['student-overlay','halaqa-overlay','bulk-overlay','import-overlay','doura-overlay','doura-student-overlay','renewal-overlay','enroll-overlay','msg-overlay','feetype-overlay','doura-feetype-overlay','center-settings-overlay','excel-import-overlay','paymethod-overlay'].forEach(closeOverlay);
+  if (e.key === 'Escape') ['student-overlay','halaqa-overlay','bulk-overlay','import-overlay','doura-overlay','doura-student-overlay','renewal-overlay','enroll-overlay','msg-overlay','feetype-overlay','doura-feetype-overlay','center-settings-overlay','excel-import-overlay'].forEach(closeOverlay);
 });
 
 // ===================== PIN =====================
@@ -899,11 +964,36 @@ function showPinReset() {
   } else { alert('❌ اسم المركز غير صحيح'); }
 }
 
-// ===================== AUTO BACKUP =====================
-let backupTimer = null;
-const BACKUP_INTERVAL = 30 * 60 * 1000;
+// ===================== BACKUP SYSTEM =====================
 const MAX_BACKUPS = 5;
+let backupTimer = null;
+let downloadTimer = null;
+let driveTimer = null;
 
+// ── Settings ──
+function bcLoadSettings() {
+  return {
+    localInterval:    parseInt(localStorage.getItem('bc_local_interval')    || '86400000'),
+    downloadInterval: parseInt(localStorage.getItem('bc_download_interval') || '86400000'),
+    driveInterval:    parseInt(localStorage.getItem('bc_drive_interval')    || '86400000'),
+    lastDownload:     localStorage.getItem('bc_last_download') || null,
+    lastDrive:        localStorage.getItem('bc_last_drive')    || null,
+  };
+}
+
+function bcSaveAutoSettings() {
+  const li = document.getElementById('bc-local-interval');
+  const di = document.getElementById('bc-download-interval');
+  const ri = document.getElementById('bc-drive-interval');
+  if (li) localStorage.setItem('bc_local_interval',    li.value);
+  if (di) localStorage.setItem('bc_download_interval', di.value);
+  if (ri) localStorage.setItem('bc_drive_interval',    ri.value);
+  scheduleBackup();
+  document.getElementById('bc-auto-status').textContent = '✅ تم حفظ الإعدادات';
+  setTimeout(() => { const el=document.getElementById('bc-auto-status'); if(el) el.textContent=''; }, 2000);
+}
+
+// ── Internal local backup (localStorage) ──
 function autoBackup() {
   try {
     const data = {halaqat, archivedHalaqat, students, dourat, semester, savedAt: new Date().toISOString(), version:3};
@@ -914,58 +1004,438 @@ function autoBackup() {
     }
     localStorage.setItem('hifz_backup_0', json);
     localStorage.setItem('hifz_backup_time', new Date().toLocaleString('ar-BH'));
-    showBackupToast();
+    showBackupToast('💾 نسخة احتياطية داخلية محفوظة');
   } catch(e) {}
 }
 
-function showBackupToast() {
-  const t = document.getElementById('backup-toast');
-  const time = localStorage.getItem('hifz_backup_time') || '';
-  t.textContent = '✅ نسخة احتياطية · ' + time;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3000);
+// ── Auto download to device ──
+function autoDownloadBackup() {
+  try {
+    const settings = bcLoadSettings();
+    if (!settings.downloadInterval) return;
+    const last = settings.lastDownload ? new Date(settings.lastDownload).getTime() : 0;
+    if (Date.now() - last < settings.downloadInterval) return;
+    bcDownloadNow(true); // silent
+    localStorage.setItem('bc_last_download', new Date().toISOString());
+  } catch(e) {}
 }
 
-function scheduleBackup() {
-  clearTimeout(backupTimer);
-  backupTimer = setTimeout(() => { autoBackup(); scheduleBackup(); }, BACKUP_INTERVAL);
+// ── Download now ──
+function bcDownloadNow(silent=false) {
+  const data = {halaqat, archivedHalaqat, students, dourat, semester, exportedAt: new Date().toISOString(), version:3};
+  const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const date = new Date().toLocaleDateString('ar-BH').replace(/\//g,'-');
+  const time = new Date().toLocaleTimeString('ar-BH',{hour:'2-digit',minute:'2-digit'}).replace(':','-');
+  a.href = url;
+  a.download = `نسخة_احتياطية_${centerName||'مركز'}_${date}_${time}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  localStorage.setItem('bc_last_download', new Date().toISOString());
+  if (!silent) toast('✅ تم تنزيل النسخة الاحتياطية', 'success');
 }
 
-function restoreFromBackup(idx=0) {
-  const raw = localStorage.getItem('hifz_backup_'+idx);
-  if (!raw) { alert('لا توجد نسخة احتياطية محفوظة'); return; }
+// ── Restore from file ──
+function bcRestoreFromFile(event) {
+  const file = event.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!data.students || !data.halaqat) throw new Error();
+      const date = data.exportedAt ? new Date(data.exportedAt).toLocaleString('ar-BH') : '—';
+      const ok = await showConfirm(
+        'استعادة نسخة احتياطية',
+        `تاريخ الملف: ${date}\n${(data.students||[]).length} طالبة · ${(data.halaqat||[]).length} حلقة\n\nسيتم استبدال البيانات الحالية. متابعة؟`,
+        '✅ استعادة', 'primary', '📂'
+      );
+      if (!ok) return;
+      halaqat=data.halaqat||[]; archivedHalaqat=data.archivedHalaqat||[];
+      students=data.students||[]; dourat=data.dourat||[];
+      semester=data.semester||'الفصل الأول';
+      saveData(); renderStudents(); updateSemesterLabel();
+      closeOverlay('backup-center-overlay');
+      toast('✅ تم استعادة البيانات بنجاح!');
+    } catch(e) { alert('❌ الملف غير صحيح'); }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+// ── Restore from internal backup ──
+async function bcRestoreLocal(idx) {
+  const raw = localStorage.getItem('hifz_backup_'+idx); if (!raw) return;
   try {
     const data = JSON.parse(raw);
     const time = data.savedAt ? new Date(data.savedAt).toLocaleString('ar-BH') : '—';
-    if (!confirm(`استعادة النسخة من:\n${time}\n\nسيتم استبدال البيانات الحالية. متابعة؟`)) return;
-    halaqat = data.halaqat||[]; archivedHalaqat = data.archivedHalaqat||[];
-    students = data.students||[]; dourat = data.dourat||[];
-    semester = data.semester||'الفصل الأول';
+    const ok = await showConfirm('استعادة نسخة داخلية', `تاريخ النسخة: ${time}\n\nسيتم استبدال البيانات الحالية. متابعة؟`, '✅ استعادة', 'primary', '💾');
+    if (!ok) return;
+    halaqat=data.halaqat||[]; archivedHalaqat=data.archivedHalaqat||[];
+    students=data.students||[]; dourat=data.dourat||[];
+    semester=data.semester||'الفصل الأول';
     saveData(); renderStudents(); updateSemesterLabel();
+    closeOverlay('backup-center-overlay');
     toast('✅ تم استعادة البيانات بنجاح!');
-  } catch(e) { alert('❌ تعذر قراءة النسخة الاحتياطية'); }
+  } catch(e) { alert('❌ تعذر قراءة النسخة'); }
 }
 
-function openBackupManager() {
-  let msg = '📦 النسخ الاحتياطية:\n\n'; let found = false;
-  for (let i=0;i<MAX_BACKUPS;i++) {
+// ── Schedule ──
+function scheduleBackup() {
+  clearTimeout(backupTimer);
+  clearTimeout(downloadTimer);
+  clearTimeout(driveTimer);
+  const s = bcLoadSettings();
+
+  // Internal localStorage backup
+  const localInt = s.localInterval || 86400000;
+  backupTimer = setInterval(() => autoBackup(), localInt);
+
+  // Auto download
+  if (s.downloadInterval) {
+    // Check if due now, else schedule
+    const lastDl = s.lastDownload ? new Date(s.lastDownload).getTime() : 0;
+    const dlDelay = Math.max(0, s.downloadInterval - (Date.now()-lastDl));
+    downloadTimer = setTimeout(function dlLoop() {
+      autoDownloadBackup();
+      downloadTimer = setTimeout(dlLoop, s.downloadInterval);
+    }, dlDelay);
+  }
+
+  // Auto Drive backup
+  if (s.driveInterval && localStorage.getItem('bc_drive_token')) {
+    const lastDr = s.lastDrive ? new Date(s.lastDrive).getTime() : 0;
+    const drDelay = Math.max(0, s.driveInterval - (Date.now()-lastDr));
+    driveTimer = setTimeout(function drLoop() {
+      bcBackupToDrive(true);
+      driveTimer = setTimeout(drLoop, s.driveInterval);
+    }, drDelay);
+  }
+}
+
+function showBackupToast(msg) {
+  const t = document.getElementById('backup-toast');
+  if (!t) return;
+  t.textContent = msg || ('✅ نسخة احتياطية · ' + (localStorage.getItem('hifz_backup_time')||''));
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ── Backup Center Modal ──
+function openBackupCenter() {
+  bcTab('local');
+  bcUpdateStatus();
+  bcRenderLocalList();
+  // Load auto settings
+  const s = bcLoadSettings();
+  const li = document.getElementById('bc-local-interval');
+  const di = document.getElementById('bc-download-interval');
+  const ri = document.getElementById('bc-drive-interval');
+  if (li) li.value = s.localInterval;
+  if (di) di.value = s.downloadInterval;
+  if (ri) ri.value = s.driveInterval;
+  // Check Drive auth
+  bcCheckDriveAuth();
+  openOverlay('backup-center-overlay');
+}
+
+function bcTab(tab) {
+  ['local','drive','auto'].forEach(t => {
+    document.getElementById('bc-panel-'+t).style.display = t===tab ? 'block' : 'none';
+    const btn = document.getElementById('bc-tab-'+t);
+    btn.style.background = t===tab ? 'var(--green)' : 'var(--white)';
+    btn.style.color = t===tab ? '#fff' : 'var(--text)';
+  });
+}
+
+function bcUpdateStatus() {
+  const s = bcLoadSettings();
+  const lastLocal = localStorage.getItem('hifz_backup_time') || '—';
+  const lastDl = s.lastDownload ? new Date(s.lastDownload).toLocaleString('ar-BH') : '—';
+  const lastDr = s.lastDrive ? new Date(s.lastDrive).toLocaleString('ar-BH') : '—';
+  const drConnected = !!localStorage.getItem('bc_drive_token');
+  document.getElementById('bc-status').innerHTML =
+    `💾 آخر نسخة داخلية: <strong>${lastLocal}</strong><br/>` +
+    `⬇️ آخر تنزيل: <strong>${lastDl}</strong><br/>` +
+    `☁️ Google Drive: <strong>${drConnected ? '🟢 متصل — آخر رفع: '+lastDr : '🔴 غير متصل'}</strong>`;
+}
+
+function bcRenderLocalList() {
+  const container = document.getElementById('bc-local-list');
+  let html = '';
+  let found = false;
+  for (let i=0; i<MAX_BACKUPS; i++) {
     const raw = localStorage.getItem('hifz_backup_'+i);
     if (raw) {
       try {
         const d = JSON.parse(raw);
         const time = d.savedAt ? new Date(d.savedAt).toLocaleString('ar-BH') : '—';
-        msg += `${i===0?'🟢':'⚪'} نسخة ${i+1}: ${time} · ${(d.students||[]).length} طالبة\n`;
+        const sCount = (d.students||[]).length;
         found = true;
+        html += `<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:${i===0?'var(--green-light)':'var(--gray-bg)'};border-radius:var(--radius);gap:8px;">
+          <div>
+            <div style="font-size:12px;font-weight:600;color:${i===0?'var(--green-dark)':'var(--text)'};">${i===0?'🟢':'⚪'} نسخة ${i+1}</div>
+            <div style="font-size:11px;color:var(--text-muted);">${time} · ${sCount} طالبة</div>
+          </div>
+          <button class="btn sm confirm" onclick="bcRestoreLocal(${i})">↩ استعادة</button>
+        </div>`;
       } catch(e) {}
     }
   }
-  if (!found) { alert('لا توجد نسخ احتياطية بعد'); return; }
-  msg += '\nأي نسخة تريدين استعادتها؟ (1-5)';
-  const ans = prompt(msg);
-  if (!ans) return;
-  const idx = parseInt(ans)-1;
-  if (idx >= 0 && idx < MAX_BACKUPS) restoreFromBackup(idx);
-  else alert('رقم غير صحيح');
+  container.innerHTML = found ? html : '<div style="font-size:13px;color:var(--text-muted);text-align:center;padding:16px;">لا توجد نسخ داخلية بعد — ستُحفظ تلقائياً قريباً</div>';
+}
+
+// ══════════════════════════════
+// GOOGLE DRIVE INTEGRATION
+// ══════════════════════════════
+const DRIVE_CLIENT_ID = localStorage.getItem('bc_drive_client_id') || '';
+const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file';
+const DRIVE_FOLDER_NAME = 'متابعة_ميزانية_المركز';
+let driveToken = localStorage.getItem('bc_drive_token') || null;
+let driveFolderId = localStorage.getItem('bc_drive_folder_id') || null;
+
+function bcCheckDriveAuth() {
+  const connected = document.getElementById('bc-drive-connected');
+  const authBtn = document.getElementById('bc-drive-auth');
+  if (driveToken) {
+    connected.style.display = 'block';
+    authBtn.style.display = 'none';
+    const userEl = document.getElementById('bc-drive-user');
+    const email = localStorage.getItem('bc_drive_email') || '';
+    userEl.innerHTML = `<span style="font-size:20px;">✅</span> متصل${email ? ' · '+email : ''}`;
+    bcListDriveFiles();
+  } else {
+    connected.style.display = 'none';
+    authBtn.style.display = 'block';
+  }
+}
+
+function bcConnectDrive() {
+  // Use Google OAuth2 implicit flow
+  const clientId = prompt('أدخلي Client ID الخاص بك من Google Cloud Console:\n\n(راجعي التعليمات في الدليل للحصول على Client ID مجاناً)');
+  if (!clientId || !clientId.includes('.apps.googleusercontent.com')) {
+    alert('❌ Client ID غير صحيح. يجب أن ينتهي بـ .apps.googleusercontent.com');
+    return;
+  }
+  localStorage.setItem('bc_drive_client_id', clientId);
+
+  const redirectUri = encodeURIComponent(window.location.href.split('?')[0]);
+  const scope = encodeURIComponent(DRIVE_SCOPE);
+  const state = btoa(JSON.stringify({action:'drive_auth', ts: Date.now()}));
+  const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=token&scope=${scope}&state=${state}&prompt=consent`;
+
+  // Open auth in popup
+  const popup = window.open(authUrl, 'google_auth', 'width=500,height=600,scrollbars=yes');
+  if (!popup) {
+    // Redirect instead
+    sessionStorage.setItem('bc_pending_auth', '1');
+    window.location.href = authUrl;
+    return;
+  }
+
+  // Listen for redirect back
+  const check = setInterval(() => {
+    try {
+      if (popup.closed) { clearInterval(check); return; }
+      const hash = popup.location.hash;
+      if (hash && hash.includes('access_token')) {
+        clearInterval(check);
+        popup.close();
+        const params = new URLSearchParams(hash.substring(1));
+        const token = params.get('access_token');
+        if (token) bcStoreDriveToken(token);
+      }
+    } catch(e) {}
+  }, 500);
+}
+
+function bcStoreDriveToken(token) {
+  driveToken = token;
+  localStorage.setItem('bc_drive_token', token);
+  // Expire after 50min (token lasts 1h)
+  setTimeout(() => {
+    driveToken = null;
+    localStorage.removeItem('bc_drive_token');
+    showBackupToast('⚠️ انتهت صلاحية Google — أعيدي الاتصال');
+  }, 50 * 60 * 1000);
+  // Get user info
+  fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+    headers: {Authorization: 'Bearer '+token}
+  }).then(r=>r.json()).then(u=>{
+    if (u.email) localStorage.setItem('bc_drive_email', u.email);
+    bcCheckDriveAuth();
+    toast('✅ تم الاتصال بـ Google Drive بنجاح!');
+  }).catch(()=>{ bcCheckDriveAuth(); });
+}
+
+function bcDisconnectDrive() {
+  driveToken = null; driveFolderId = null;
+  localStorage.removeItem('bc_drive_token');
+  localStorage.removeItem('bc_drive_folder_id');
+  localStorage.removeItem('bc_drive_email');
+  bcCheckDriveAuth();
+  toast('تم قطع الاتصال بـ Google Drive', 'info');
+}
+
+async function bcGetOrCreateFolder() {
+  if (driveFolderId) return driveFolderId;
+  // Search for folder
+  const search = await fetch(
+    `https://www.googleapis.com/drive/v3/files?q=name='${DRIVE_FOLDER_NAME}' and mimeType='application/vnd.google-apps.folder' and trashed=false&fields=files(id,name)`,
+    {headers: {Authorization: 'Bearer '+driveToken}}
+  ).then(r=>r.json());
+
+  if (search.files && search.files.length > 0) {
+    driveFolderId = search.files[0].id;
+    localStorage.setItem('bc_drive_folder_id', driveFolderId);
+    return driveFolderId;
+  }
+
+  // Create folder
+  const create = await fetch('https://www.googleapis.com/drive/v3/files', {
+    method: 'POST',
+    headers: {Authorization: 'Bearer '+driveToken, 'Content-Type': 'application/json'},
+    body: JSON.stringify({name: DRIVE_FOLDER_NAME, mimeType: 'application/vnd.google-apps.folder'})
+  }).then(r=>r.json());
+
+  driveFolderId = create.id;
+  localStorage.setItem('bc_drive_folder_id', driveFolderId);
+  return driveFolderId;
+}
+
+async function bcBackupToDrive(silent=false) {
+  if (!driveToken) {
+    if (!silent) toast('سجّلي الدخول بـ Google Drive أولاً', 'warn');
+    return;
+  }
+  try {
+    const folderId = await bcGetOrCreateFolder();
+    const data = {halaqat, archivedHalaqat, students, dourat, semester, exportedAt: new Date().toISOString(), version:3};
+    const json = JSON.stringify(data, null, 2);
+    const date = new Date().toLocaleDateString('ar-BH').replace(/\//g,'-');
+    const time = new Date().toLocaleTimeString('ar-BH',{hour:'2-digit',minute:'2-digit'}).replace(':','-');
+    const fileName = `نسخة_احتياطية_${centerName||'مركز'}_${date}_${time}.json`;
+
+    // Upload via multipart
+    const metadata = {name: fileName, parents: [folderId]};
+    const boundary = '-------314159265358979323846';
+    const delimiter = `\r\n--${boundary}\r\n`;
+    const closeDelim = `\r\n--${boundary}--`;
+    const body =
+      delimiter + 'Content-Type: application/json\r\n\r\n' + JSON.stringify(metadata) +
+      delimiter + 'Content-Type: application/json\r\n\r\n' + json + closeDelim;
+
+    const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+      method: 'POST',
+      headers: {Authorization: 'Bearer '+driveToken, 'Content-Type': `multipart/related; boundary="${boundary}"`},
+      body
+    });
+
+    if (res.ok) {
+      localStorage.setItem('bc_last_drive', new Date().toISOString());
+      if (!silent) {
+        toast('✅ تم الرفع على Google Drive بنجاح!');
+        bcListDriveFiles();
+        bcUpdateStatus();
+      } else {
+        showBackupToast('☁️ تم الرفع على Google Drive تلقائياً');
+      }
+      // Keep only last 7 files in folder
+      bcCleanOldDriveFiles(folderId);
+    } else {
+      const err = await res.json();
+      if (err.error?.status === 'UNAUTHENTICATED') {
+        driveToken = null; localStorage.removeItem('bc_drive_token');
+        if (!silent) toast('انتهت صلاحية الجلسة — أعيدي الاتصال', 'warn');
+      } else {
+        if (!silent) toast('❌ فشل الرفع: ' + (err.error?.message||''), 'error');
+      }
+    }
+  } catch(e) {
+    if (!silent) toast('❌ خطأ في الاتصال بـ Drive', 'error');
+  }
+}
+
+async function bcListDriveFiles() {
+  const container = document.getElementById('bc-drive-list');
+  if (!container || !driveToken) return;
+  container.innerHTML = '<div style="font-size:12px;color:var(--text-muted);padding:8px;">جارٍ التحميل...</div>';
+  try {
+    const folderId = await bcGetOrCreateFolder();
+    const res = await fetch(
+      `https://www.googleapis.com/drive/v3/files?q='${folderId}' in parents and trashed=false&fields=files(id,name,createdTime,size)&orderBy=createdTime desc&pageSize=10`,
+      {headers: {Authorization: 'Bearer '+driveToken}}
+    ).then(r=>r.json());
+
+    if (!res.files || !res.files.length) {
+      container.innerHTML = '<div style="font-size:12px;color:var(--text-muted);text-align:center;padding:16px;">لا توجد ملفات محفوظة بعد</div>';
+      return;
+    }
+
+    container.innerHTML = res.files.map((f,i) => {
+      const date = new Date(f.createdTime).toLocaleString('ar-BH');
+      const size = f.size ? Math.round(f.size/1024)+'KB' : '';
+      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:${i===0?'var(--blue-light)':'var(--gray-bg)'};border-radius:var(--radius);gap:8px;">
+        <div>
+          <div style="font-size:11px;font-weight:600;color:${i===0?'var(--blue)':'var(--text)'};">${i===0?'🟢':'☁️'} ${f.name.replace(/نسخة_احتياطية_[^_]+_/,'')}</div>
+          <div style="font-size:11px;color:var(--text-muted);">${date}${size?' · '+size:''}</div>
+        </div>
+        <button class="btn sm confirm" onclick="bcRestoreFromDrive('${f.id}','${f.name}')">↩</button>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    container.innerHTML = '<div style="font-size:12px;color:var(--red);padding:8px;">❌ تعذر تحميل القائمة</div>';
+  }
+}
+
+async function bcRestoreFromDrive(fileId, fileName) {
+  if (!driveToken) return;
+  const ok = await showConfirm('استعادة من Drive', `استعادة الملف:\n${fileName}\n\nسيتم استبدال البيانات الحالية. متابعة؟`, '✅ استعادة', 'primary', '☁️');
+  if (!ok) return;
+  try {
+    const res = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, {
+      headers: {Authorization: 'Bearer '+driveToken}
+    });
+    const data = await res.json();
+    if (!data.students || !data.halaqat) throw new Error();
+    halaqat=data.halaqat||[]; archivedHalaqat=data.archivedHalaqat||[];
+    students=data.students||[]; dourat=data.dourat||[];
+    semester=data.semester||'الفصل الأول';
+    saveData(); renderStudents(); updateSemesterLabel();
+    closeOverlay('backup-center-overlay');
+    toast('✅ تم استعادة البيانات من Drive بنجاح!');
+  } catch(e) { toast('❌ تعذر استعادة الملف', 'error'); }
+}
+
+async function bcCleanOldDriveFiles(folderId, keep=7) {
+  try {
+    const res = await fetch(
+      `https://www.googleapis.com/drive/v3/files?q='${folderId}' in parents and trashed=false&fields=files(id)&orderBy=createdTime desc&pageSize=50`,
+      {headers: {Authorization: 'Bearer '+driveToken}}
+    ).then(r=>r.json());
+    const files = res.files || [];
+    if (files.length <= keep) return;
+    // Delete oldest files beyond keep limit
+    for (let i=keep; i<files.length; i++) {
+      fetch(`https://www.googleapis.com/drive/v3/files/${files[i].id}`, {
+        method: 'DELETE', headers: {Authorization: 'Bearer '+driveToken}
+      }).catch(()=>{});
+    }
+  } catch(e) {}
+}
+
+// Check for OAuth redirect on page load
+function bcCheckOAuthRedirect() {
+  const hash = window.location.hash;
+  if (hash && hash.includes('access_token')) {
+    const params = new URLSearchParams(hash.substring(1));
+    const token = params.get('access_token');
+    if (token) {
+      bcStoreDriveToken(token);
+      // Clean URL
+      history.replaceState(null, '', window.location.pathname);
+    }
+  }
 }
 
 // ===================== SETUP & CENTER =====================
@@ -1180,7 +1650,7 @@ function renderStudents() {
             : sh.paid
               ? `<div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;">
                    <span class="badge paid">✓ دفعت</span>
-                   ${sh.paidAt ? `<span class="paid-date">📅 ${fmtDate(sh.paidAt)}${sh.paymentMethod?(sh.paymentMethod==='cash'?' · 💵 كاش':' · 🏦 بنفت'):''}</span>` : ''}
+                   ${sh.paidAt ? `<span class="paid-date">📅 ${fmtDate(sh.paidAt)}</span>` : ''}
                  </div>
                  <button class="btn sm danger" onclick="event.stopPropagation();toggleHalaqaPaid(${s._i},'${sh.hid}')">إلغاء</button>`
               : `<span class="badge unpaid">✗ لم تدفع</span>
@@ -1201,7 +1671,7 @@ function renderStudents() {
       <div class="student-header" onclick="toggleCard('sc-${s._i}')">
         <div style="flex:1;min-width:0;pointer-events:none;">
           <div class="student-name">${esc(s.name)}</div>
-          <div class="student-phone" dir="ltr" style="text-align:right;">${s.userid?'#'+esc(s.userid)+'  ·  ':''}${esc(s.phone||'')}${s.personalid?'  ·  🆔'+esc(s.personalid):''}</div>
+          <div class="student-phone" dir="ltr" style="text-align:right;">${s.userid?'#'+esc(s.userid)+'  ·  ':''}${esc(s.phone||'')}</div>
           ${noteHtml}
           <div style="margin-top:5px;">${halaqaBadges}</div>
         </div>
@@ -1225,38 +1695,13 @@ function renderStudents() {
 function toggleCard(id) { const el=document.getElementById(id); if(el) el.classList.toggle('open'); }
 function togglePaused(idx) { students[idx].paused=!students[idx].paused; saveData(); renderStudents(); }
 
-let pendingPayment = null; // {kind:'halaqa'|'doura', ...refs}
-
 function toggleHalaqaPaid(studentIdx, hid) {
   const sh = (students[studentIdx].halaqat||[]).find(sh=>sh.hid===hid);
-  if (!sh) return;
-  if (sh.paid) {
-    // Cancelling payment — no method needed
-    sh.paid = false; sh.paidAt = null; sh.paymentMethod = null;
+  if (sh) {
+    sh.paid = !sh.paid;
+    sh.paidAt = sh.paid ? new Date().toISOString() : null;
     saveData(); renderStudents();
-  } else {
-    const s = students[studentIdx];
-    const h = halaqat.find(h=>h.id===hid);
-    pendingPayment = { kind:'halaqa', studentIdx, hid };
-    document.getElementById('paymethod-info').textContent = `${s.name} — ${h?h.name:''}`;
-    openOverlay('paymethod-overlay');
   }
-}
-
-function confirmPaymentMethod(method) {
-  if (!pendingPayment) return;
-  if (pendingPayment.kind === 'halaqa') {
-    const sh = (students[pendingPayment.studentIdx].halaqat||[]).find(sh=>sh.hid===pendingPayment.hid);
-    if (sh) { sh.paid = true; sh.paidAt = new Date().toISOString(); sh.paymentMethod = method; }
-    saveData(); renderStudents();
-  } else if (pendingPayment.kind === 'doura') {
-    const s = dourat[pendingPayment.douraIdx].students[pendingPayment.stuIdx];
-    s.paid = true; s.paidAt = new Date().toISOString(); s.paymentMethod = method;
-    saveData(); renderDourat(pendingPayment.douraIdx);
-  }
-  pendingPayment = null;
-  closeOverlay('paymethod-overlay');
-  toast(method==='cash' ? '✅ تم تسجيل الدفع (كاش)' : '✅ تم تسجيل الدفع (بنفت)');
 }
 
 async function deleteStudent(idx) {
@@ -1274,7 +1719,6 @@ function openStudentModal(id=null) {
   const s = id!==null ? students[id] : null;
   document.getElementById('f-name').value = s?s.name:'';
   document.getElementById('f-userid').value = s?(s.userid||''):'';
-  document.getElementById('f-personalid').value = s?(s.personalid||''):'';
   document.getElementById('f-phone').value = s?(s.phone||''):'';
   document.getElementById('f-note').value = s?(s.note||''):'';
   const cl = document.getElementById('halaqa-checklist');
@@ -1296,7 +1740,6 @@ function openStudentModal(id=null) {
 function saveStudent() {
   const name = document.getElementById('f-name').value.trim();
   const userid = document.getElementById('f-userid').value.trim();
-  const personalid = document.getElementById('f-personalid').value.trim();
   const phone = document.getElementById('f-phone').value.trim();
   const note = document.getElementById('f-note').value.trim();
   if (!name) { alert('يرجى إدخال اسم الطالبة'); return; }
@@ -1309,11 +1752,11 @@ function saveStudent() {
   const checked = [...document.querySelectorAll('#halaqa-checklist input[type=checkbox]:checked')].map(c=>c.value);
   if (editStudentId!==null) {
     const existing = students[editStudentId].halaqat||[];
-    students[editStudentId] = {...students[editStudentId], name, userid, personalid, phone, note,
+    students[editStudentId] = {...students[editStudentId], name, userid, phone, note,
       halaqat: checked.map(hid => existing.find(sh=>sh.hid===hid) || {hid,paid:false,paidAt:null})
     };
   } else {
-    students.push({id:uid(), name, userid, personalid, phone, note, halaqat: checked.map(hid=>({hid,paid:false,paidAt:null}))});
+    students.push({id:uid(), name, userid, phone, note, halaqat: checked.map(hid=>({hid,paid:false,paidAt:null}))});
   }
   saveData(); closeOverlay('student-overlay'); renderStudents();
   toast(editStudentId!==null?'✅ تم تحديث البيانات':'✅ تمت إضافة الطالبة');
@@ -1323,17 +1766,14 @@ function saveStudent() {
 function renderHalaqat() {
   const tbody = document.getElementById('halaqat-tbody');
   if (!halaqat.length) {
-    tbody.innerHTML = '<tr><td colspan="9"><div class="empty-state"><div class="empty-state-icon">📚</div><div class="empty-state-title">لا توجد حلقات بعد</div><div class="empty-state-sub">اضغطي "+ إضافة حلقة" للبدء</div></div></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="empty-state-icon">📚</div><div class="empty-state-title">لا توجد حلقات بعد</div><div class="empty-state-sub">اضغطي "+ إضافة حلقة" للبدء</div></div></td></tr>';
     return;
   }
   tbody.innerHTML = halaqat.map((h,i) => {
     const count = students.filter(s=>(s.halaqat||[]).some(sh=>sh.hid===h.id)).length;
-    const timeLabel = h.time==='صباحي'?'☀️ صباحي':h.time==='مسائي'?'🌙 مسائي':'—';
     return `<tr>
       <td style="color:var(--text-muted);font-size:12px;">${i+1}</td>
       <td style="font-weight:600;">${esc(h.name)}</td>
-      <td style="color:var(--text-muted);">${esc(h.type||'—')}</td>
-      <td style="color:var(--text-muted);">${timeLabel}</td>
       <td style="color:var(--text-muted);">${esc(h.teacher||'—')}</td>
       <td style="color:var(--text-muted);">${esc(h.supervisor||'—')}</td>
       <td>${h.amount} د.ب</td>
@@ -1352,8 +1792,6 @@ function openHalaqaModal(id=null) {
   document.getElementById('halaqa-modal-title').textContent = id!==null?'تعديل الحلقة':'إضافة حلقة جديدة';
   const h = id!==null ? halaqat[id] : null;
   document.getElementById('h-name').value = h?h.name:'';
-  document.getElementById('h-type').value = h?(h.type||''):'';
-  document.getElementById('h-time').value = h?(h.time||''):'';
   document.getElementById('h-teacher').value = h?(h.teacher||''):'';
   document.getElementById('h-supervisor').value = h?(h.supervisor||''):'';
   document.getElementById('h-amount').value = h?h.amount:'';
@@ -1363,16 +1801,14 @@ function openHalaqaModal(id=null) {
 
 function saveHalaqa() {
   const name = document.getElementById('h-name').value.trim();
-  const type = document.getElementById('h-type').value.trim();
-  const time = document.getElementById('h-time').value;
   const teacher = document.getElementById('h-teacher').value.trim();
   const supervisor = document.getElementById('h-supervisor').value.trim();
   const amount = parseFloat(document.getElementById('h-amount').value)||0;
   if (!name) { alert('يرجى إدخال اسم الحلقة'); return; }
   if (editHalaqaId!==null) {
-    halaqat[editHalaqaId] = {...halaqat[editHalaqaId], name, type, time, teacher, supervisor, amount};
+    halaqat[editHalaqaId] = {...halaqat[editHalaqaId], name, teacher, supervisor, amount};
   } else {
-    halaqat.push({id:uid(), name, type, time, teacher, supervisor, amount});
+    halaqat.push({id:uid(), name, teacher, supervisor, amount});
   }
   saveData(); closeOverlay('halaqa-overlay'); renderHalaqat();
   toast(editHalaqaId!==null?'✅ تم تحديث الحلقة':'✅ تمت إضافة الحلقة');
@@ -1461,7 +1897,7 @@ function renderDourat(keepOpenIdx=null) {
             : s.paid
               ? `<div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;">
                    <span class="badge paid">✓ دفعت</span>
-                   ${s.paidAt ? `<span class="paid-date">📅 ${fmtDate(s.paidAt)}${s.paymentMethod?(s.paymentMethod==='cash'?' · 💵 كاش':' · 🏦 بنفت'):''}</span>` : ''}
+                   ${s.paidAt ? `<span class="paid-date">📅 ${fmtDate(s.paidAt)}</span>` : ''}
                  </div>
                  <button class="btn sm danger" onclick="event.stopPropagation();toggleDouraStudentPaid(${didx},${realIdx})">إلغاء</button>`
               : `<span class="badge unpaid">✗ لم تدفع</span>
@@ -1509,15 +1945,9 @@ function renderDourat(keepOpenIdx=null) {
 
 function toggleDouraStudentPaid(douraIdx, stuIdx) {
   const s = dourat[douraIdx].students[stuIdx];
-  if (s.paid) {
-    s.paid = false; s.paidAt = null; s.paymentMethod = null;
-    saveData(); renderDourat(douraIdx);
-  } else {
-    const d = dourat[douraIdx];
-    pendingPayment = { kind:'doura', douraIdx, stuIdx };
-    document.getElementById('paymethod-info').textContent = `${s.name} — ${d.name}`;
-    openOverlay('paymethod-overlay');
-  }
+  s.paid = !s.paid;
+  s.paidAt = s.paid ? new Date().toISOString() : null;
+  saveData(); renderDourat(douraIdx);
 }
 
 function deleteDouraStudent(douraIdx, stuIdx) {
@@ -1846,7 +2276,7 @@ function saveFeeType() {
   if(!sh) return;
   sh.feeType=document.getElementById('feetype-select').value;
   sh.customAmount=parseFloat(document.getElementById('feetype-amount').value)||0;
-  if(sh.feeType==='exempt'||sh.feeType==='sponsored'){ sh.paid=false; sh.paidAt=null; sh.paymentMethod=null; }
+  if(sh.feeType==='exempt'||sh.feeType==='sponsored'){ sh.paid=false; sh.paidAt=null; }
   saveData(); closeOverlay('feetype-overlay'); renderStudents();
 }
 
@@ -1867,7 +2297,7 @@ function saveDouraFeeType() {
   const s=dourat[feeTypeDouraIdx].students[feeTypeStuIdx];
   s.feeType=document.getElementById('doura-feetype-select').value;
   s.customAmount=parseFloat(document.getElementById('doura-feetype-amount').value)||0;
-  if(s.feeType==='exempt'||s.feeType==='sponsored'){ s.paid=false; s.paidAt=null; s.paymentMethod=null; }
+  if(s.feeType==='exempt'||s.feeType==='sponsored'){ s.paid=false; s.paidAt=null; }
   saveData(); closeOverlay('doura-feetype-overlay'); renderDourat(feeTypeDouraIdx);
 }
 
@@ -1965,7 +2395,7 @@ function renderReports() {
                 :sh.feeType==='sponsored'?'<span class="badge" style="background:var(--blue-light);color:var(--blue);">بكفالة</span>'
                 :sh.paid?'<span class="badge paid">✓ دفعت</span>'
                 :'<span class="badge unpaid">✗ لم تدفع</span>';
-              const dateStr = sh.paid && sh.paidAt ? `<span style="font-size:11px;color:var(--green-dark);">📅 ${fmtDate(sh.paidAt)}${sh.paymentMethod?(sh.paymentMethod==='cash'?' · 💵':' · 🏦'):''}</span>` : '—';
+              const dateStr = sh.paid && sh.paidAt ? `<span style="font-size:11px;color:var(--green-dark);">📅 ${fmtDate(sh.paidAt)}</span>` : '—';
               return `<tr><td style="color:var(--text-muted)">${i+1}</td><td style="font-weight:500">${esc(s.name)}</td><td dir="ltr" style="color:var(--text-muted)">${esc(s.phone||'—')}</td><td>${eff} د.ب</td><td>${statusBadge}</td><td>${dateStr}</td></tr>`;
             }).join('')}
           </tbody>
@@ -2004,7 +2434,7 @@ function renderReports() {
                 :s.feeType==='sponsored'?'<span class="badge" style="background:var(--blue-light);color:var(--blue);">بكفالة</span>'
                 :s.paid?'<span class="badge paid">✓ دفعت</span>'
                 :'<span class="badge unpaid">✗ لم تدفع</span>';
-              const dateStr = s.paid && s.paidAt ? `<span style="font-size:11px;color:var(--green-dark);">📅 ${fmtDate(s.paidAt)}${s.paymentMethod?(s.paymentMethod==='cash'?' · 💵':' · 🏦'):''}</span>` : '—';
+              const dateStr = s.paid && s.paidAt ? `<span style="font-size:11px;color:var(--green-dark);">📅 ${fmtDate(s.paidAt)}</span>` : '—';
               return `<tr><td style="color:var(--text-muted)">${i+1}</td><td style="font-weight:500">${esc(s.name)}</td><td dir="ltr" style="color:var(--text-muted)">${esc(s.phone||'—')}</td><td>${esc(sec?sec.name:'—')}</td><td>${eff} د.ب</td><td>${statusBadge}</td><td>${dateStr}</td></tr>`;
             }).join('')}
           </tbody>
@@ -2036,7 +2466,7 @@ function printHalaqaSheet(hid) {
     const eff=sh.feeType==='exempt'?0:(sh.feeType==='reduced'||sh.feeType==='sponsored')?(sh.customAmount||0):h.amount;
     const status=sh.feeType==='exempt'?'معفية':sh.feeType==='sponsored'?'بكفالة':sh.paid?'✓ دفعت':'✗ لم تدفع';
     const statusColor=sh.paid||sh.feeType==='exempt'||sh.feeType==='sponsored'?'#0F6E56':'#E24B4A';
-    const dateStr = sh.paid && sh.paidAt ? fmtDate(sh.paidAt) + (sh.paymentMethod ? (sh.paymentMethod==='cash'?' (كاش)':' (بنفت)') : '') : '—';
+    const dateStr = sh.paid && sh.paidAt ? fmtDate(sh.paidAt) : '—';
     return `<tr><td style="width:30px;text-align:center;">${i+1}</td><td style="min-width:140px;">${esc(s.name)}</td><td style="width:90px;" dir="ltr">${esc(s.phone||'—')}</td><td style="width:60px;text-align:center;">${eff} د.ب</td><td style="width:70px;text-align:center;color:${statusColor};font-weight:600;">${status}</td><td style="width:85px;text-align:center;font-size:11px;color:#555;">${dateStr}</td><td style="width:80px;"></td></tr>`;
   }).join('');
   const win = window.open('','_blank');
@@ -2074,7 +2504,7 @@ function printDouraSheet(did) {
     const eff=st.effAmt(s);
     const status=s.feeType==='exempt'?'معفية':s.feeType==='sponsored'?'بكفالة':s.paid?'✓ دفعت':'✗ لم تدفع';
     const statusColor=s.paid||s.feeType==='exempt'||s.feeType==='sponsored'?'#0F6E56':'#E24B4A';
-    const dateStr = s.paid && s.paidAt ? fmtDate(s.paidAt) + (s.paymentMethod ? (s.paymentMethod==='cash'?' (كاش)':' (بنفت)') : '') : '—';
+    const dateStr = s.paid && s.paidAt ? fmtDate(s.paidAt) : '—';
     return `<tr><td style="width:30px;text-align:center;">${i+1}</td><td style="min-width:130px;">${esc(s.name)}</td><td style="width:90px;" dir="ltr">${esc(s.phone||'—')}</td><td style="width:70px;">${esc(sec?sec.name:'—')}</td><td style="width:60px;text-align:center;">${eff} د.ب</td><td style="width:70px;text-align:center;color:${statusColor};font-weight:600;">${status}</td><td style="width:85px;text-align:center;font-size:11px;color:#555;">${dateStr}</td><td style="width:80px;"></td></tr>`;
   }).join('');
   const win = window.open('','_blank');
@@ -2107,29 +2537,27 @@ function exportReportExcel() {
   if (typeof XLSX==='undefined') { alert('مكتبة Excel غير متوفرة'); return; }
   const wb = XLSX.utils.book_new();
   if (halaqat.length) {
-    const data=[['الحلقة','النوع','الوقت','المعلمة','إجمالي الطالبات','المحصّل','المتبقي','نسبة التحصيل']];
-    halaqat.forEach(h=>{const st=calcHalaqaStats(h);const pct=st.expected>0?Math.round(st.paid/st.expected*100):100;data.push([h.name,h.type||'—',h.time||'—',h.teacher||'—',st.studs.length,st.paid,st.unpaid,pct+'%']);});
+    const data=[['الحلقة','المعلمة','إجمالي الطالبات','المحصّل','المتبقي','نسبة التحصيل']];
+    halaqat.forEach(h=>{const st=calcHalaqaStats(h);const pct=st.expected>0?Math.round(st.paid/st.expected*100):100;data.push([h.name,h.teacher||'—',st.studs.length,st.paid,st.unpaid,pct+'%']);});
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(data), 'الحلقات');
   }
   if (students.length) {
-    const data=[['الاسم','الرقم الشخصي','الهاتف','رقم المستخدم','الحلقات','الحالة','تاريخ آخر دفع','طريقة الدفع']];
+    const data=[['الاسم','الهاتف','رقم المستخدم','الحلقات','الحالة','تاريخ آخر دفع']];
     students.forEach(s=>{
       const names=(s.halaqat||[]).map(sh=>{const h=halaqat.find(h=>h.id===sh.hid);return h?h.name:'';}).filter(Boolean).join(' / ');
       const hasUnpaid=(s.halaqat||[]).some(sh=>!sh.paid&&sh.feeType!=='exempt'&&sh.feeType!=='sponsored');
       const lastPaid=(s.halaqat||[]).filter(sh=>sh.paid&&sh.paidAt).sort((a,b)=>new Date(b.paidAt)-new Date(a.paidAt));
-      const method = lastPaid.length ? (lastPaid[0].paymentMethod==='cash'?'كاش':lastPaid[0].paymentMethod==='benefit'?'بنفت':'—') : '—';
-      data.push([s.name,s.personalid||'',s.phone||'',s.userid||'',names,s.paused?'متوقفة':hasUnpaid?'متأخرة':'مكتملة',lastPaid.length?fmtDate(lastPaid[0].paidAt):'—',method]);
+      data.push([s.name,s.phone||'',s.userid||'',names,s.paused?'متوقفة':hasUnpaid?'متأخرة':'مكتملة',lastPaid.length?fmtDate(lastPaid[0].paidAt):'—']);
     });
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(data), 'الطالبات');
   }
   dourat.filter(d=>!d.archived).forEach(d=>{
     const st=calcDouraStats(d);
-    const data=[['الاسم','الهاتف','القسم','الرسوم','الحالة','تاريخ الدفع','طريقة الدفع']];
+    const data=[['الاسم','الهاتف','القسم','الرسوم','الحالة','تاريخ الدفع']];
     st.studs.forEach(s=>{
       const sec=st.sections.find(sec=>sec.id===s.sectionId)||st.sections[0];
       const status=s.feeType==='exempt'?'معفية':s.feeType==='sponsored'?'بكفالة':s.paid?'دفعت':'لم تدفع';
-      const method = s.paid && s.paymentMethod ? (s.paymentMethod==='cash'?'كاش':'بنفت') : '—';
-      data.push([s.name,s.phone||'',sec?sec.name:'—',st.effAmt(s),status,s.paid&&s.paidAt?fmtDate(s.paidAt):'—',method]);
+      data.push([s.name,s.phone||'',sec?sec.name:'—',st.effAmt(s),status,s.paid&&s.paidAt?fmtDate(s.paidAt):'—']);
     });
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(data), d.name.slice(0,30));
   });
@@ -2237,13 +2665,19 @@ if (!waTemplate) waTemplate = 'السلام عليكم ورحمة الله وب�
 applyCenter();
 updateSemesterLabel();
 
+// Check Google OAuth redirect
+bcCheckOAuthRedirect();
+
 if (!centerName) {
   document.getElementById('setup-screen').style.display = 'flex';
 } else {
   renderStudents();
   initLock();
   scheduleBackup();
+  // First internal backup after 5 min
   if (students.length || halaqat.length) setTimeout(autoBackup, 5*60*1000);
+  // Check if auto-download is due
+  setTimeout(autoDownloadBackup, 10*1000);
 }
 
 if ('serviceWorker' in navigator) {
